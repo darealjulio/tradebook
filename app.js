@@ -88,30 +88,6 @@ const esc = (s) => {
 };
 
 // ─── Seed Data ───
-const SEED_DAILY = [
-  { id:'s1', date:'2026-02-03', pnl:3792.3, trades:6, wins:6, losses:0, rating:'great', session:'New York', preMarket:'ISM Manufacturing PMI 10:00 AM. Bias bullish above 21500.', postMarket:'Followed the plan perfectly. All 6 trades hit TP. Trust the 13 EMA tap.', reviewed:true },
-  { id:'s2', date:'2026-02-04', pnl:804, trades:4, wins:3, losses:1, rating:'great', session:'New York', preMarket:'JOLTS Job Openings 10:00 AM.', postMarket:'Cut the loser quickly, let winners run. Entry on trade 2 was slightly early.', reviewed:true },
-  { id:'s3', date:'2026-02-05', pnl:-3800, trades:15, wins:4, losses:11, rating:'bad', session:'New York', preMarket:'ADP Employment 8:15 AM, ISM Services 10:00 AM.', postMarket:'Overtraded badly. 15 trades is insane. Revenge traded after first 3 losses. STOP after 3 consecutive losses.', reviewed:false },
-  { id:'s4', date:'2026-02-06', pnl:4070, trades:5, wins:4, losses:1, rating:'great', session:'New York', preMarket:'Nonfarm Payrolls 8:30 AM - WAIT for reaction.', postMarket:'Bounced back strong. Stayed disciplined, only 5 trades. Fewer trades, bigger winners.', reviewed:true },
-  { id:'s5', date:'2026-02-07', pnl:1250, trades:3, wins:3, losses:0, rating:'great', session:'New York', preMarket:'Light calendar. Trend continuation focus.', postMarket:'Clean 3-for-3 day. Quit early with profit. This is the way.', reviewed:true },
-  { id:'s6', date:'2026-02-10', pnl:3950, trades:4, wins:4, losses:0, rating:'great', session:'New York', preMarket:'No major events. ORB + EMA tap setups.', postMarket:'Perfect execution. 4 winners, all A+ setups.', reviewed:true },
-  { id:'s7', date:'2026-02-11', pnl:266, trades:2, wins:2, losses:0, rating:'okay', session:'New York', preMarket:'CPI tomorrow - reduce size.', postMarket:'Small green day. Only 2 trades and walked away. Smart.', reviewed:true },
-  { id:'s8', date:'2026-02-12', pnl:3140, trades:4, wins:3, losses:1, rating:'great', session:'New York', preMarket:'CPI 8:30 AM - wait for initial move.', postMarket:'Great read on CPI reaction. Waited 15 min then caught the trend.', reviewed:true },
-  { id:'s9', date:'2026-02-13', pnl:5860, trades:5, wins:5, losses:0, rating:'great', session:'New York', preMarket:'PPI 8:30 AM. Looking for continuation.', postMarket:'Best day of the month. 5 for 5. ORB breakout was textbook.', reviewed:true },
-];
-
-const SEED_TRADES = [
-  { id:'t1', date:'2026-02-03', symbol:'MNQ', side:'Long', strategy:'ORB Breakout', pnl:633.68, volume:2, entry:21520, exit:21565, emotions:'calm', rating:5 },
-  { id:'t2', date:'2026-02-03', symbol:'MNQ', side:'Long', strategy:'EMA Tap', pnl:633.68, volume:2, entry:21570, exit:21610, emotions:'patient', rating:5 },
-  { id:'t3', date:'2026-02-05', symbol:'MNQ', side:'Short', strategy:'Reversal', pnl:-750, volume:3, entry:21480, exit:21530, emotions:'FOMO', rating:1 },
-];
-
-const SEED_JOURNAL = [
-  { id:'j1', date:'2026-02-05', title:'Why I overtrade and how to stop', category:'mindset', mood:'frustrated', body:'Today was a disaster. 15 trades. The pattern is always the same — I take a loss, get frustrated, then start chasing. Rules: 3-loss daily stop, walk away 15 min after any loss, if I feel the urge to "make it back" — STOP.' },
-  { id:'j2', date:'2026-02-03', title:'The 13 EMA tap is my edge', category:'strategy', mood:'locked', body:'When price trends above 48 EMA and pulls back to tap 13 EMA, the bounce is almost always good for 20+ points on MNQ. Hit this 3 times today. All winners.' },
-  { id:'j3', date:'2026-02-01', title:'February goals check-in', category:'goals', mood:'calm', body:'Net positive month. Max 5 trades/day average. Win rate above 60%. Zero revenge trading days. Journal every single trading day.' },
-];
-
 const CAT = {
   mindset: { emoji:'🧠', color:'#60a5fa', label:'Mindset' },
   lesson: { emoji:'📝', color:'#10b981', label:'Lesson' },
@@ -763,11 +739,6 @@ async function init() {
   let [daily, trades, journal] = await Promise.all([
     dbGetAll('daily'), dbGetAll('trades'), dbGetAll('journal')
   ]);
-
-  // Seed if empty
-  if (daily.length === 0) { await dbPutMany('daily', SEED_DAILY); daily = SEED_DAILY; }
-  if (trades.length === 0) { await dbPutMany('trades', SEED_TRADES); trades = SEED_TRADES; }
-  if (journal.length === 0) { await dbPutMany('journal', SEED_JOURNAL); journal = SEED_JOURNAL; }
 
   state.daily = daily;
   state.trades = trades;
