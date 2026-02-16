@@ -1,12 +1,12 @@
-/* ═══════════════════════════════════════════
-   TradeBook — Trading Journal PWA
-   Vanilla JS · IndexedDB · Chart.js
-   ═══════════════════════════════════════════ */
+/* âââââââââââââââââââââââââââââââââââââââââââ
+   TradeBook â Trading Journal PWA
+   Vanilla JS Â· IndexedDB Â· Chart.js
+   âââââââââââââââââââââââââââââââââââââââââââ */
 
-// ─── IndexedDB Storage ───
+// âââ IndexedDB Storage âââ
 const DB_NAME = 'tradebook';
-const DB_VERSION = 1;
-const STORES = ['daily', 'trades', 'journal'];
+var DB_VERSION = 1;
+var STORES = ['daily', 'trades', 'journal'];
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -20,34 +20,81 @@ function openDB() {
   });
 }
 
+async function localGetAll(store) {
+  var db = await openDB();
+  return new Promise(function(resolve, reject) {
+    var tx = db.transaction(store, 'readonly');
+    var req = tx.objectStore(store).getAll();
+    req.onsuccess = function() { resolve(req.result); };
+    req.onerror = function() { reject(req.error); };
+  });
+}
+
+// ─── Field name mapping ───
+function toSnake(obj) {
+  var o = Object.assign({}, obj);
+  if (o.preMarket !== undefined) { o.pre_market = o.preMarket; delete o.preMarket; }
+  if (o.postMarket !== undefined) { o.post_market = o.postMarket; delete o.postMarket; }
+  return o;
+}
+function toCamel(obj) {
+  var o = Object.assign({}, obj);
+  if (o.pre_market !== undefined) { o.preMarket = o.pre_market; delete o.pre_market; }
+  if (o.post_market !== undefined) { o.postMarket = o.post_market; delete o.post_market; }
+  return o;
+}
+
 async function dbGetAll(store) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, 'readonly');
-    const req = tx.objectStore(store).getAll();
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+  if (typeof supabase !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
+    try {
+      var table = SB_TABLES[store] || store;
+      var res = await supabase.from(table).select('*').eq('user_id', currentUser.id);
+      if (res.data) { return res.data.map(toCamel); }
+    } catch(e) { console.warn('Supabase fetch failed, using local:', e); }
+  }
+  return localGetAll(store);
+}
+
+async function localPut(store, item) {
+  var db = await openDB();
+  return new Promise(function(resolve, reject) {
+    var tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).put(item);
+    tx.oncomplete = function() { resolve(); };
+    tx.onerror = function() { reject(tx.error); };
   });
 }
 
 async function dbPut(store, item) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, 'readwrite');
-    tx.objectStore(store).put(item);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
+  await localPut(store, item);
+  if (typeof supabase !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
+    try {
+      var table = SB_TABLES[store] || store;
+      var row = toSnake(item);
+      row.user_id = currentUser.id;
+      await supabase.from(table).upsert(row);
+    } catch(e) { console.warn('Supabase save failed:', e); }
+  }
+}
+
+async function localDelete(store, id) {
+  var db = await openDB();
+  return new Promise(function(resolve, reject) {
+    var tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).delete(id);
+    tx.oncomplete = function() { resolve(); };
+    tx.onerror = function() { reject(tx.error); };
   });
 }
 
 async function dbDelete(store, id) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, 'readwrite');
-    tx.objectStore(store).delete(id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  await localDelete(store, id);
+  if (typeof supabase !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
+    try {
+      var table = SB_TABLES[store] || store;
+      await supabase.from(table).delete().eq('id', id).eq('user_id', currentUser.id);
+    } catch(e) { console.warn('Supabase delete failed:', e); }
+  }
 }
 
 async function dbPutMany(store, items) {
@@ -61,7 +108,7 @@ async function dbPutMany(store, items) {
   });
 }
 
-// ─── Helpers ───
+// âââ Helpers âââ
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const today = () => new Date().toISOString().split('T')[0];
 const fmtDate = (iso) => {
@@ -104,7 +151,7 @@ const MOOD = {
 
 const RATING_EMOJI = { great:'\u{1F7E2}', okay:'\u{1F7E1}', bad:'\u{1F534}' };
 
-// ─── State ───
+// âââ State âââ
 let state = {
   tab: 'overview',
   daily: [],
@@ -118,7 +165,7 @@ let state = {
   charts: {},
 };
 
-// ─── Render Engine ───
+// âââ Render Engine âââ
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
@@ -139,6 +186,7 @@ function render() {
           <div>
             <p class="label" style="margin-bottom:2px">Trading Journal</p>
             <h1 class="heading-xl">TradeBook</h1>
+            <button id="logout-btn" style="margin-top:4px;padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-size:0.625rem;cursor:pointer;font-family:var(--font)">Sign Out</button>
           </div>
           <div class="tab-bar">
             ${['overview','calendar','journal'].map(t => `
@@ -180,7 +228,7 @@ function computeStats() {
   return { totalTrades, totalWins, totalLosses, netPnl, winRate, greenDays, redDays, pf, chartData, days: d.length };
 }
 
-// ─── Overview Tab ───
+// âââ Overview Tab âââ
 function renderOverview(s) {
   const ringR = 34, circ = 2*Math.PI*ringR, filled = (s.winRate/100)*circ;
   return `
@@ -249,7 +297,7 @@ function renderOverview(s) {
   `;
 }
 
-// ─── Calendar Tab ───
+// âââ Calendar Tab âââ
 function renderCalendar() {
   const y = state.calYear;
   const m = state.calMonth;
@@ -327,7 +375,7 @@ function renderCalendar() {
     + '</div>';
 }
 
-// ─── Journal Tab ───
+// âââ Journal Tab âââ
 function renderJournal() {
   const entries = [...state.journal].sort((a,b) => b.date.localeCompare(a.date));
   return '<div class="stack">'
@@ -351,13 +399,13 @@ function renderJournal() {
     + '</div>';
 }
 
-// ─── Detail View ───
+// âââ Detail View âââ
 function renderDetail() {
   const { entry: e, type } = state.viewing;
   const app = $('#app');
 
   if (type === 'calday') {
-    // Calendar day detail — shows daily summary + individual trades
+    // Calendar day detail â shows daily summary + individual trades
     const dateStr = e;
     const dailyEntry = state.daily.find(d => d.date === dateStr);
     const dayTrades = state.trades.filter(t => t.date === dateStr);
@@ -481,7 +529,7 @@ function renderDetail() {
   });
 }
 
-// ─── Modal ───
+// âââ Modal âââ
 function renderModal() {
   var content = '';
   if (state.modal === 'picker') {
@@ -555,7 +603,7 @@ function renderModal() {
     + '</div></div>';
 }
 
-// ─── Charts (Chart.js) ───
+// âââ Charts (Chart.js) âââ
 function initCharts(stats) {
   if (typeof Chart === 'undefined' || stats.chartData.length === 0) return;
   Chart.defaults.font.family = "'DM Sans', sans-serif";
@@ -599,7 +647,7 @@ function initCharts(stats) {
   }
 }
 
-// ─── Events ───
+// âââ Events âââ
 function bindEvents() {
   // tabs
   $$('.tab-btn').forEach(function(btn) {
@@ -744,7 +792,7 @@ async function handleSave() {
   render();
 }
 
-// ─── Init ───
+// âââ Init âââ
 async function init() {
   // Load data
   var results = await Promise.all([
@@ -764,5 +812,8 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(function() {});
 }
 
-// Boot
-document.addEventListener('DOMContentLoaded', init);
+// Boot — auth.js calls init() after authentication
+// If no auth module, boot directly
+if (typeof supabase === 'undefined') {
+  document.addEventListener('DOMContentLoaded', init);
+}
