@@ -109,3 +109,36 @@ body { font-family: var(--font); background: var(--bg-0); color: var(--text-0); 
 @supports(padding-top: env(safe-area-inset-top)) {
   .app-shell { padding-top: env(safe-area-inset-top); }
 }
+
+
+/* Calendar navigation buttons */
+.cal-nav-btn {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.cal-nav-btn:hover { background: var(--bg-2); }
+
+/* Small danger button for inline delete */
+.btn-danger-sm {
+  background: transparent;
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #ef4444;
+  font-size: 0.6875rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font);
+  margin-top: 4px;
+  transition: background 0.15s;
+}
+.btn-danger-sm:hover { background: rgba(239,68,68,0.1); }
