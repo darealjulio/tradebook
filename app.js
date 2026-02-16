@@ -45,10 +45,10 @@ function toCamel(obj) {
 }
 
 async function dbGetAll(store) {
-  if (typeof supabase !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
+  if (typeof sb !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
     try {
       var table = SB_TABLES[store] || store;
-      var res = await supabase.from(table).select('*').eq('user_id', currentUser.id);
+      var res = await sb.from(table).select('*').eq('user_id', currentUser.id);
       if (res.data) { return res.data.map(toCamel); }
     } catch(e) { console.warn('Supabase fetch failed, using local:', e); }
   }
@@ -67,12 +67,12 @@ async function localPut(store, item) {
 
 async function dbPut(store, item) {
   await localPut(store, item);
-  if (typeof supabase !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
+  if (typeof sb !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
     try {
       var table = SB_TABLES[store] || store;
       var row = toSnake(item);
       row.user_id = currentUser.id;
-      await supabase.from(table).upsert(row);
+      await sb.from(table).upsert(row);
     } catch(e) { console.warn('Supabase save failed:', e); }
   }
 }
@@ -89,10 +89,10 @@ async function localDelete(store, id) {
 
 async function dbDelete(store, id) {
   await localDelete(store, id);
-  if (typeof supabase !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
+  if (typeof sb !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
     try {
       var table = SB_TABLES[store] || store;
-      await supabase.from(table).delete().eq('id', id).eq('user_id', currentUser.id);
+      await sb.from(table).delete().eq('id', id).eq('user_id', currentUser.id);
     } catch(e) { console.warn('Supabase delete failed:', e); }
   }
 }
@@ -814,6 +814,6 @@ if ('serviceWorker' in navigator) {
 
 // Boot — auth.js calls init() after authentication
 // If no auth module, boot directly
-if (typeof supabase === 'undefined') {
+if (typeof sb === 'undefined') {
   document.addEventListener('DOMContentLoaded', init);
 }
