@@ -84,6 +84,7 @@ function renderAuthScreen() {
 async function handleAuthChange(event, session) {
   if (session && session.user) {
     currentUser = session.user;
+    sb.from('profiles').upsert({ id: session.user.id, display_name: (session.user.email || '').split('@')[0] }, { onConflict: 'id' });
     if (typeof init === 'function') init();
   } else {
     currentUser = null;
@@ -111,3 +112,4 @@ async function logout() {
     renderAuthScreen();
   }
 })();
+

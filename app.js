@@ -10,6 +10,7 @@ var STORES = ['daily', 'trades', 'journal'];
 
 function openDB() {
   return new Promise((resolve, reject) => {
+var SB_TABLES = { daily: 'daily_entries', trades: 'trades', journal: 'journal_entries' };
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
@@ -189,9 +190,9 @@ function render() {
             <button id="logout-btn" style="margin-top:4px;padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-size:0.625rem;cursor:pointer;font-family:var(--font)">Sign Out</button>
           </div>
           <div class="tab-bar">
-            ${['overview','calendar','journal'].map(t => `
+            ${['overview','calendar','journal','groups'].map(t => `
               <button class="tab-btn ${state.tab===t?'active':''}" data-tab="${t}">
-                ${{overview:'\u{1F4CA} Stats',calendar:'\u{1F4C5} Cal',journal:'\u270D\uFE0F Write'}[t]}
+                ${{overview:'\u{1F4CA} Stats',calendar:'\u{1F4C5} Cal',journal:'\u270D\uFE0F Write',groups:'\u{1F465} Groups'}[t]}
               </button>
             `).join('')}
           </div>
@@ -199,7 +200,8 @@ function render() {
         <div id="tab-content">${
           state.tab === 'overview' ? renderOverview(stats) :
           state.tab === 'calendar' ? renderCalendar() :
-          renderJournal()
+            state.tab === 'journal' ? renderJournal() :
+            renderGroups()
         }</div>
       </div>
       <button class="fab" id="fab-btn">+</button>
@@ -649,6 +651,11 @@ function initCharts(stats) {
 
 // âââ Events âââ
 function bindEvents() {
+  // Sign Out
+  var logoutBtn = $('#logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', function() { if (typeof logout === 'function') logout(); });
+  // Groups events
+  if (typeof bindGroupEvents === 'function') bindGroupEvents();
   // tabs
   $$('.tab-btn').forEach(function(btn) {
     btn.addEventListener('click', function() { state.tab = btn.dataset.tab; render(); });
@@ -802,7 +809,8 @@ async function init() {
   state.daily = results[0];
   state.trades = results[1];
   state.journal = results[2];
-  state.loaded = true;
+    state.loaded = true; 
+if (typeof loadGroups === 'function') loadGroups();
 
   render();
 }
