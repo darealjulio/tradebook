@@ -1,19 +1,19 @@
 /*
-  TradeBook — Supabase Auth Module
+  TradeBook â Supabase Auth Module
   Handles signup, login, logout, and session persistence.
   Loaded before app.js in index.html.
 */
 
-const SUPABASE_URL = 'https://kdeaulglvhqqgboeggsl.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZWF1bGdsdmhxcWdib2VnZ3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMTE5MzQsImV4cCI6MjA4Njc4NzkzNH0.6uyJa6O-H49M36pOohxJpoXdE0RGEeOLI41sTARURmY';
+var SUPABASE_URL = 'https://kdeaulglvhqqgboeggsl.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZWF1bGdsdmhxcWdib2VnZ3NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMTE5MzQsImV4cCI6MjA4Njc4NzkzNH0.6uyJa6O-H49M36pOohxJpoXdE0RGEeOLI41sTARURmY';
 
 // Initialize Supabase client (loaded via CDN in index.html)
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Current user reference
 let currentUser = null;
 
-// — Auth UI —
+// â Auth UI â
 
 function renderAuthScreen() {
   const app = document.getElementById('app');
@@ -56,9 +56,9 @@ function renderAuthScreen() {
     try {
       var result;
       if (isLogin) {
-        result = await supabase.auth.signInWithPassword({ email: email, password: pass });
+        result = await sb.auth.signInWithPassword({ email: email, password: pass });
       } else {
-        result = await supabase.auth.signUp({ email: email, password: pass });
+        result = await sb.auth.signUp({ email: email, password: pass });
       }
       if (result.error) throw result.error;
       if (!isLogin && !result.data.session) {
@@ -79,7 +79,7 @@ function renderAuthScreen() {
   });
 }
 
-// — Session Management —
+// â Session Management â
 
 async function handleAuthChange(event, session) {
   if (session && session.user) {
@@ -91,19 +91,19 @@ async function handleAuthChange(event, session) {
   }
 }
 
-// — Logout (call from app.js) —
+// â Logout (call from app.js) â
 
 async function logout() {
-  await supabase.auth.signOut();
+  await sb.auth.signOut();
   currentUser = null;
   renderAuthScreen();
 }
 
-// — Boot auth —
+// â Boot auth â
 
 (async function bootAuth() {
-  supabase.auth.onAuthStateChange(handleAuthChange);
-  var sess = await supabase.auth.getSession();
+  sb.auth.onAuthStateChange(handleAuthChange);
+  var sess = await sb.auth.getSession();
   if (sess.data.session && sess.data.session.user) {
     currentUser = sess.data.session.user;
     if (typeof init === 'function') init();
