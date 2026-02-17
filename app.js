@@ -1,16 +1,16 @@
-/* Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
-   TradeBook Ã¢ÂÂ Trading Journal PWA
-   Vanilla JS ÃÂ· IndexedDB ÃÂ· Chart.js
-   Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ */
+/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+   TradeBook ÃÂ¢ÃÂÃÂ Trading Journal PWA
+   Vanilla JS ÃÂÃÂ· IndexedDB ÃÂÃÂ· Chart.js
+   ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ IndexedDB Storage Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ IndexedDB Storage ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 const DB_NAME = 'tradebook';
 var DB_VERSION = 1;
 var STORES = ['daily', 'trades', 'journal'];
+var SB_TABLES = { daily: 'daily_entries', trades: 'trades', journal: 'journal_entries' };
 
 function openDB() {
   return new Promise((resolve, reject) => {
-var SB_TABLES = { daily: 'daily_entries', trades: 'trades', journal: 'journal_entries' };
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
@@ -31,7 +31,7 @@ async function localGetAll(store) {
   });
 }
 
-// âââ Field name mapping âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Field name mapping Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function toSnake(obj) {
   var o = Object.assign({}, obj);
   if (o.preMarket !== undefined) { o.pre_market = o.preMarket; delete o.preMarket; }
@@ -109,7 +109,7 @@ async function dbPutMany(store, items) {
   });
 }
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Helpers Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Helpers ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const today = () => new Date().toISOString().split('T')[0];
 const fmtDate = (iso) => {
@@ -152,7 +152,7 @@ const MOOD = {
 
 const RATING_EMOJI = { great:'\u{1F7E2}', okay:'\u{1F7E1}', bad:'\u{1F534}' };
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ State Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ State ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 let state = {
   tab: 'overview',
   daily: [],
@@ -166,7 +166,7 @@ let state = {
   charts: {},
 };
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Render Engine Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Render Engine ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
@@ -183,7 +183,7 @@ function render() {
   app.innerHTML = `
     <div class="app-shell">
       <div class="app-content">
-        <div class="row between" style="margin-bottom:16px">
+        <div class="row between" style="margin-bottom:16px;gap:16px">
           <div>
             <p class="label" style="margin-bottom:2px">Trading Journal</p>
             <h1 class="heading-xl">TradeBook</h1>
@@ -230,7 +230,7 @@ function computeStats() {
   return { totalTrades, totalWins, totalLosses, netPnl, winRate, greenDays, redDays, pf, chartData, days: d.length };
 }
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Overview Tab Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Overview Tab ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function renderOverview(s) {
   const ringR = 34, circ = 2*Math.PI*ringR, filled = (s.winRate/100)*circ;
   return `
@@ -304,7 +304,7 @@ function renderOverview(s) {
   `;
 }
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Calendar Tab Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Calendar Tab ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function renderCalendar() {
   const y = state.calYear;
   const m = state.calMonth;
@@ -347,7 +347,7 @@ function renderCalendar() {
     if (!weeks[key]) weeks[key] = { pnl:0, days:0 };
     weeks[key].pnl += d.pnl; weeks[key].days++;
   });
-  const weekArr = Object.entries(weeks).map(([k,v],i) => ({ label:'Wk '+(i+1), ...v }));
+  const weekArr = Object.entries(weeks).sort((a,b) => a[0].localeCompare(b[0])).map(([k,v],i) => ({ label:'Wk '+(i+1), ...v }));
 
   const dayHeaders = ['S','M','T','W','T','F','S'].map(d => '<div class="cal-header">'+d+'</div>').join('');
   const cells = allDays.map(({ day, dow, pnl, trades, dateStr, entry, dayTrades }) => {
@@ -382,7 +382,7 @@ function renderCalendar() {
     + '</div>';
 }
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Journal Tab Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Journal Tab ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function renderJournal() {
   const entries = [...state.journal].sort((a,b) => b.date.localeCompare(a.date));
   return '<div class="stack">'
@@ -406,13 +406,13 @@ function renderJournal() {
     + '</div>';
 }
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Detail View Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Detail View ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function renderDetail() {
   const { entry: e, type } = state.viewing;
   const app = $('#app');
 
   if (type === 'calday') {
-    // Calendar day detail Ã¢ÂÂ shows daily summary + individual trades
+    // Calendar day detail ÃÂ¢ÃÂÃÂ shows daily summary + individual trades
     const dateStr = e;
     const dailyEntry = state.daily.find(d => d.date === dateStr);
     const dayTrades = state.trades.filter(t => t.date === dateStr);
@@ -536,7 +536,7 @@ function renderDetail() {
   });
 }
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Modal Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Modal ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function renderModal() {
   var content = '';
   if (state.modal === 'picker') {
@@ -610,7 +610,7 @@ function renderModal() {
     + '</div></div>';
 }
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Charts (Chart.js) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Charts (Chart.js) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function initCharts(stats) {
   if (typeof Chart === 'undefined' || stats.chartData.length === 0) return;
   Chart.defaults.font.family = "'DM Sans', sans-serif";
@@ -654,7 +654,7 @@ function initCharts(stats) {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Events Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Events ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function bindEvents() {
   // Sign Out
   var logoutBtn = $('#logout-btn');
@@ -811,9 +811,13 @@ async function handleSave() {
   }
   state.modal = null;
   render();
+  // Refresh leaderboard after save
+  if (typeof groupState !== 'undefined' && groupState.activeGroup) {
+    loadLeaderboard(groupState.activeGroup);
+  }
 }
 
-// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Init Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Init ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 async function init() {
   // Load data
   var results = await Promise.all([
@@ -834,7 +838,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(function() {});
 }
 
-// Boot â auth.js calls init() after authentication
+// Boot Ã¢ÂÂ auth.js calls init() after authentication
 // If no auth module, boot directly
 if (typeof sb === 'undefined') {
   document.addEventListener('DOMContentLoaded', init);
