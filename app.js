@@ -1,9 +1,9 @@
-/* âââââââââââââââââââââââââââââââââââââââââââ
-   TradeBook â Trading Journal PWA
-   Vanilla JS Â· IndexedDB Â· Chart.js
-   âââââââââââââââââââââââââââââââââââââââââââ */
+/* Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+   TradeBook Ã¢ÂÂ Trading Journal PWA
+   Vanilla JS ÃÂ· IndexedDB ÃÂ· Chart.js
+   Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ */
 
-// âââ IndexedDB Storage âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ IndexedDB Storage Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const DB_NAME = 'tradebook';
 var DB_VERSION = 1;
 var STORES = ['daily', 'trades', 'journal'];
@@ -31,7 +31,7 @@ async function localGetAll(store) {
   });
 }
 
-// ─── Field name mapping ───
+// âââ Field name mapping âââ
 function toSnake(obj) {
   var o = Object.assign({}, obj);
   if (o.preMarket !== undefined) { o.pre_market = o.preMarket; delete o.preMarket; }
@@ -109,7 +109,7 @@ async function dbPutMany(store, items) {
   });
 }
 
-// âââ Helpers âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Helpers Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const today = () => new Date().toISOString().split('T')[0];
 const fmtDate = (iso) => {
@@ -152,7 +152,7 @@ const MOOD = {
 
 const RATING_EMOJI = { great:'\u{1F7E2}', okay:'\u{1F7E1}', bad:'\u{1F534}' };
 
-// âââ State âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ State Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 let state = {
   tab: 'overview',
   daily: [],
@@ -166,7 +166,7 @@ let state = {
   charts: {},
 };
 
-// âââ Render Engine âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Render Engine Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
@@ -230,7 +230,7 @@ function computeStats() {
   return { totalTrades, totalWins, totalLosses, netPnl, winRate, greenDays, redDays, pf, chartData, days: d.length };
 }
 
-// âââ Overview Tab âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Overview Tab Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function renderOverview(s) {
   const ringR = 34, circ = 2*Math.PI*ringR, filled = (s.winRate/100)*circ;
   return `
@@ -295,11 +295,16 @@ function renderOverview(s) {
           `).join('')}
         </div>
       </div>
+      ${typeof renderStreakCard === 'function' ? renderStreakCard(state.daily, state.journal) : ''}
+      ${typeof renderRuleViolations === 'function' ? renderRuleViolations(state.daily) : ''}
+      ${typeof renderStrategyBreakdown === 'function' ? renderStrategyBreakdown(state.trades) : ''}
+      ${typeof renderMonthlyRecap === 'function' ? renderMonthlyRecap(state.daily, state.trades, state.journal) : ''}
+      ${typeof renderExportSection === 'function' ? renderExportSection() : ''}
     </div>
   `;
 }
 
-// âââ Calendar Tab âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Calendar Tab Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function renderCalendar() {
   const y = state.calYear;
   const m = state.calMonth;
@@ -377,7 +382,7 @@ function renderCalendar() {
     + '</div>';
 }
 
-// âââ Journal Tab âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Journal Tab Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function renderJournal() {
   const entries = [...state.journal].sort((a,b) => b.date.localeCompare(a.date));
   return '<div class="stack">'
@@ -401,13 +406,13 @@ function renderJournal() {
     + '</div>';
 }
 
-// âââ Detail View âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Detail View Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function renderDetail() {
   const { entry: e, type } = state.viewing;
   const app = $('#app');
 
   if (type === 'calday') {
-    // Calendar day detail â shows daily summary + individual trades
+    // Calendar day detail Ã¢ÂÂ shows daily summary + individual trades
     const dateStr = e;
     const dailyEntry = state.daily.find(d => d.date === dateStr);
     const dayTrades = state.trades.filter(t => t.date === dateStr);
@@ -531,7 +536,7 @@ function renderDetail() {
   });
 }
 
-// âââ Modal âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Modal Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function renderModal() {
   var content = '';
   if (state.modal === 'picker') {
@@ -567,7 +572,7 @@ function renderModal() {
       + '</div>'
       + '<div class="grid-3">'
       + '<div class="form-group"><label class="form-label">Side</label><select class="select" id="m-side"><option>Long</option><option>Short</option></select></div>'
-      + '<div class="form-group"><label class="form-label">Strategy</label><select class="select" id="m-strategy"><option>ORB Breakout</option><option>EMA Tap</option><option>Supply Reject</option><option>Demand Bounce</option><option>Reversal</option></select></div>'
+      + '<div class="form-group"><label class="form-label">Strategy</label>' + (typeof renderStrategySelect === 'function' ? renderStrategySelect('m-strategy') : '<select class="select" id="m-strategy"><option>ORB Breakout</option><option>EMA Tap</option><option>Supply Reject</option><option>Demand Bounce</option><option>Reversal</option></select>') + '</div>'
       + '<div class="form-group"><label class="form-label">Volume</label><input type="number" class="input" id="m-volume" value="2"></div>'
       + '</div>'
       + '<div class="grid-3">'
@@ -605,7 +610,7 @@ function renderModal() {
     + '</div></div>';
 }
 
-// âââ Charts (Chart.js) âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Charts (Chart.js) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function initCharts(stats) {
   if (typeof Chart === 'undefined' || stats.chartData.length === 0) return;
   Chart.defaults.font.family = "'DM Sans', sans-serif";
@@ -649,7 +654,7 @@ function initCharts(stats) {
   }
 }
 
-// âââ Events âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Events Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function bindEvents() {
   // Sign Out
   var logoutBtn = $('#logout-btn');
@@ -746,6 +751,15 @@ function bindEvents() {
       render();
     });
   });
+
+  // Bind export buttons (features.js)
+  if (typeof bindExportButtons === 'function' && state.tab === 'overview') {
+    bindExportButtons();
+  }
+  // Bind custom strategy select (features.js)
+  if (state.modal === 'trade' && typeof bindStrategySelect === 'function') {
+    bindStrategySelect('m-strategy');
+  }
 }
 
 async function handleSave() {
@@ -799,7 +813,7 @@ async function handleSave() {
   render();
 }
 
-// âââ Init âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Init Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function init() {
   // Load data
   var results = await Promise.all([
@@ -820,7 +834,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(function() {});
 }
 
-// Boot — auth.js calls init() after authentication
+// Boot â auth.js calls init() after authentication
 // If no auth module, boot directly
 if (typeof sb === 'undefined') {
   document.addEventListener('DOMContentLoaded', init);
