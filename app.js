@@ -204,7 +204,7 @@ function render() {
         <div id="tab-content">${
           state.tab === 'overview' ? renderOverview(stats) :
           state.tab === 'calendar' ? renderCalendar() :
-            state.tab === 'journal' ? renderJournal() :
+            state.tab === 'journal' ? renderJournal() : ''
 
         }</div>
       </div>
