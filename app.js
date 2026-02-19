@@ -194,7 +194,7 @@ function render() {
             <button id="logout-btn" style="margin-top:4px;padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-size:0.625rem;cursor:pointer;font-family:var(--font)">Sign Out</button>
           </div>
           <div class="tab-bar">
-            ${['overview','calendar','journal','groups'].map(t => `
+            ${['overview','calendar','journal'].map(t => `
               <button class="tab-btn ${state.tab===t?'active':''}" data-tab="${t}">
                 ${{overview:'\u{1F4CA} Stats',calendar:'\u{1F4C5} Cal',journal:'\u270D\uFE0F Write',groups:'\u{1F465} Groups'}[t]}
               </button>
@@ -205,7 +205,7 @@ function render() {
           state.tab === 'overview' ? renderOverview(stats) :
           state.tab === 'calendar' ? renderCalendar() :
             state.tab === 'journal' ? renderJournal() :
-            renderGroups()
+
         }</div>
       </div>
       <button class="fab" id="fab-btn">+</button>
@@ -663,8 +663,8 @@ function bindEvents() {
   // Sign Out
   var logoutBtn = $('#logout-btn');
   if (logoutBtn) logoutBtn.addEventListener('click', function() { if (typeof logout === 'function') logout(); });
-  // Groups events
-  if (typeof bindGroupEvents === 'function') bindGroupEvents();
+
+
   // tabs
   $$('.tab-btn').forEach(function(btn) {
     btn.addEventListener('click', function() { state.tab = btn.dataset.tab; render(); });
@@ -846,11 +846,11 @@ async function handleSave() {
   }
   state.modal = null;
   render();
-  // Refresh leaderboard after save
-  if (typeof groupState !== 'undefined') {
-    var _lbGroup = groupState.activeGroup || (groupState.groups && groupState.groups[0] ? groupState.groups[0].id : null);
-    if (_lbGroup) loadLeaderboard(_lbGroup).then(function() { render(); });
-  }
+
+
+
+
+
 }
 
 // ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Init ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
@@ -864,7 +864,7 @@ async function init() {
   state.trades = results[1];
   state.journal = results[2];
     state.loaded = true; 
-if (typeof loadGroups === 'function') loadGroups();
+
 
   render();
 }
@@ -880,4 +880,4 @@ if (typeof sb === 'undefined') {
   document.addEventListener('DOMContentLoaded', init);
 }
 
-// v9-autogroup-leaderboard-fix
+// v10-no-groups-focus-save
