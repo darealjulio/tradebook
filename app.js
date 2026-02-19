@@ -847,8 +847,9 @@ async function handleSave() {
   state.modal = null;
   render();
   // Refresh leaderboard after save
-  if (typeof groupState !== 'undefined' && groupState.activeGroup) {
-    loadLeaderboard(groupState.activeGroup).then(function() { render(); });
+  if (typeof groupState !== 'undefined') {
+    var _lbGroup = groupState.activeGroup || (groupState.groups && groupState.groups[0] ? groupState.groups[0].id : null);
+    if (_lbGroup) loadLeaderboard(_lbGroup).then(function() { render(); });
   }
 }
 
@@ -879,4 +880,4 @@ if (typeof sb === 'undefined') {
   document.addEventListener('DOMContentLoaded', init);
 }
 
-// v8-user-scoped-daily-ids
+// v9-autogroup-leaderboard-fix
