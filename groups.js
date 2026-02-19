@@ -44,6 +44,11 @@ async function loadGroups() {
     var gids = memRes.data.map(function(m) { return m.group_id; });
     var grpRes = await sb.from('groups').select('*').in('id', gids);
     groupState.groups = grpRes.data || [];
+    // Auto-set activeGroup to first group if not already set (so leaderboard loads on startup)
+    if (!groupState.activeGroup && groupState.groups.length > 0) {
+      groupState.activeGroup = groupState.groups[0].id;
+      if (typeof loadLeaderboard === 'function') loadLeaderboard(groupState.activeGroup);
+    }
   } catch(e) { console.warn('Failed to load groups:', e); }
 }
 
