@@ -817,7 +817,7 @@ async function handleSave() {
       await dbPut('daily', existingDaily);
     } else {
       var autoDaily = {
-        id: 'auto_' + tradeDate,
+        id: 'auto_' + (typeof currentUser !== 'undefined' && currentUser ? currentUser.id + '_' : '') + tradeDate,
         date: tradeDate,
         pnl: dayPnl,
         trades: dayTrades.length,
@@ -879,4 +879,4 @@ if (typeof sb === 'undefined') {
   document.addEventListener('DOMContentLoaded', init);
 }
 
-// v6-trade-field-mapping-fix
+// v8-user-scoped-daily-ids
