@@ -167,6 +167,7 @@ let state = {
   viewing: null,
   calYear: new Date().getFullYear(),
   calMonth: new Date().getMonth(),
+  editingTrade: null,
   charts: {},
 };
 
@@ -304,7 +305,8 @@ function renderOverview(s) {
       ${typeof renderStrategyBreakdown === 'function' ? renderStrategyBreakdown(state.trades) : ''}
       ${typeof renderMonthlyRecap === 'function' ? renderMonthlyRecap(state.daily, state.trades, state.journal) : ''}
       ${typeof renderExportSection === 'function' ? renderExportSection() : ''}
-    </div>
+
+    ${typeof renderPnlGoals === 'function' ? renderPnlGoals(state.daily) : ''}    </div>
   `;
 }
 
@@ -456,6 +458,8 @@ function renderDetail() {
             + (t.exit ? '<span class="text-dim" style="font-size:0.625rem">Exit: '+t.exit+'</span>' : '')
             + '</div>'
             + '<button class="btn-danger-sm" data-delete-trade="'+t.id+'">Delete trade</button>'
+        '<button class="btn btn-secondary" style="margin-left:6px;font-size:0.6875rem;padding:4px 10px" data-edit-trade="' + t.id + '">Edit</button>' +
+        (t.notes ? '<p class="text-dim" style="font-size:0.6875rem;margin-top:4px;font-style:italic">\uD83D\uDCDD ' + esc(t.notes) + '</p>' : '') +
             + '</div>';
         }).join('')
       + '</div></div>';
@@ -537,6 +541,19 @@ function renderDetail() {
       state.viewing = { entry: e, type: 'calday' };
       render();
     });
+
+  // Edit individual trades
+  $$('[data-edit-trade]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var id = btn.dataset.editTrade;
+      var trade = state.trades.find(function(t) { return t.id === id; });
+      if (trade) {
+        state.editingTrade = trade;
+        state.modal = 'edit-trade';
+        render();
+      }
+    });
+  });
   });
 }
 
@@ -591,8 +608,34 @@ function renderModal() {
       + [1,2,3,4,5].map(function(n) { return '<button class="star-btn" data-star="'+n+'" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:'+(n<=4?'var(--amber)':'var(--bg-0)')+';color:'+(n<=4?'#000':'var(--text-3)')+';font-weight:800;font-size:0.75rem;cursor:pointer;font-family:var(--font)">\u2605</button>'; }).join('')
       + '</div></div>'
       + '</div>'
+        '<div class="form-group"><label class="form-label">Notes / Setup</label><textarea class="textarea" id="m-notes" rows="2" placeholder="Entry reason, setup quality, lessons..."></textarea></div>' +
       + '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Back</button><button class="btn btn-primary" style="flex:2" id="m-save">Save Trade</button></div>'
       + '</div>';
+  } else if (state.modal === 'edit-trade') {
+    var t = state.editingTrade;
+    if (t) {
+      content = '<h3 class="heading-lg" style="margin-bottom:12px">\u270F\uFE0F Edit Trade</h3>' +
+        '<div class="stack gap-12">' +
+        '<div class="grid-2">' +
+        '<div class="form-group"><label class="form-label">Date</label><input type="date" class="input" id="m-date" value="' + (t.date||'') + '"></div>' +
+        '<div class="form-group"><label class="form-label">Symbol</label><input class="input" id="m-symbol" value="' + esc(t.symbol||'MNQ') + '"></div>' +
+        '</div>' +
+        '<div class="grid-3">' +
+        '<div class="form-group"><label class="form-label">Side</label><select class="select" id="m-side"><option' + (t.side==='Long'?' selected':'') + '>Long</option><option' + (t.side==='Short'?' selected':'') + '>Short</option></select></div>' +
+        '<div class="form-group"><label class="form-label">Strategy</label>' +
+        (typeof renderStrategySelect === 'function' ? renderStrategySelect('m-strategy', t.strategy) : '<select class="select" id="m-strategy"><option>' + esc(t.strategy||'ORB Breakout') + '</option></select>') +
+        '</div>' +
+        '<div class="form-group"><label class="form-label">Volume</label><input type="number" class="input" id="m-volume" value="' + (t.volume||1) + '"></div>' +
+        '</div>' +
+        '<div class="grid-3">' +
+        '<div class="form-group"><label class="form-label">Net P&L</label><input type="number" step="0.01" class="input mono" id="m-pnl" value="' + (t.pnl||0) + '"></div>' +
+        '<div class="form-group"><label class="form-label">Entry</label><input type="number" step="0.01" class="input mono" id="m-entry" value="' + (t.entry||0) + '"></div>' +
+        '<div class="form-group"><label class="form-label">Exit</label><input type="number" step="0.01" class="input mono" id="m-exit" value="' + (t.exit||0) + '"></div>' +
+        '</div>' +
+        '<div class="form-group"><label class="form-label">Notes / Setup</label><textarea class="textarea" id="m-notes" rows="2" placeholder="Entry reason, setup quality...">' + esc(t.notes||'') + '</textarea></div>' +
+        '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Cancel</button><button class="btn btn-primary" style="flex:2" id="m-save">Update Trade</button></div>' +
+        '</div>';
+    }
   } else if (state.modal === 'journal') {
     content = '<h3 class="heading-lg" style="margin-bottom:12px">\u270D\uFE0F Journal Entry</h3>'
       + '<div class="stack gap-12">'
@@ -764,6 +807,10 @@ function bindEvents() {
   if (state.modal === 'trade' && typeof bindStrategySelect === 'function') {
     bindStrategySelect('m-strategy');
   }
+  // Bind P&L Goal Tracker (features.js)
+  if (typeof bindPnlGoals === 'function' && state.tab === 'overview') {
+    bindPnlGoals();
+  }
 }
 
 async function handleSave() {
@@ -798,6 +845,7 @@ async function handleSave() {
       exit: parseFloat(($('#m-exit') || {}).value) || 0,
       emotions: ($('#m-emotions') || {}).value || 'calm',
       rating: ratingEl ? parseInt(ratingEl.dataset.rating) : 4,
+      notes: ($('#m-notes') || {}).value || '',
     };
     state.trades.push(entry);
     await dbPut('trades', entry);
@@ -844,6 +892,43 @@ async function handleSave() {
     state.journal.push(entry);
     await dbPut('journal', entry);
   }
+  } else if (mode === 'edit-trade') {
+    var orig = state.editingTrade;
+    if (orig) {
+      var updated = {
+        id: orig.id,
+        date: ($('#m-date') || {}).value || orig.date,
+        symbol: ($('#m-symbol') || {}).value || orig.symbol,
+        side: ($('#m-side') || {}).value || orig.side,
+        strategy: ($('#m-strategy') || {}).value || orig.strategy,
+        pnl: parseFloat(($('#m-pnl') || {}).value) || orig.pnl,
+        volume: parseInt(($('#m-volume') || {}).value) || orig.volume,
+        entry: parseFloat(($('#m-entry') || {}).value) || orig.entry,
+        exit: parseFloat(($('#m-exit') || {}).value) || orig.exit,
+        emotions: orig.emotions,
+        rating: orig.rating,
+        notes: ($('#m-notes') || {}).value || '',
+      };
+      // Replace in state
+      var idx = state.trades.findIndex(function(t) { return t.id === orig.id; });
+      if (idx !== -1) state.trades[idx] = updated;
+      await dbPut('trades', updated);
+      // Recalculate daily totals
+      var tradeDate = updated.date;
+      var dayTrades = state.trades.filter(function(t) { return t.date === tradeDate; });
+      var dayPnl = dayTrades.reduce(function(s, t) { return s + (t.pnl || 0); }, 0);
+      var dayWins = dayTrades.filter(function(t) { return t.pnl > 0; }).length;
+      var dayLosses = dayTrades.filter(function(t) { return t.pnl < 0; }).length;
+      var existingDaily = state.daily.find(function(d) { return d.date === tradeDate; });
+      if (existingDaily) {
+        existingDaily.pnl = dayPnl;
+        existingDaily.trades = dayTrades.length;
+        existingDaily.wins = dayWins;
+        existingDaily.losses = dayLosses;
+        await dbPut('daily', existingDaily);
+      }
+      state.editingTrade = null;
+    }
   state.modal = null;
   render();
 
@@ -880,4 +965,4 @@ if (typeof sb === 'undefined') {
   document.addEventListener('DOMContentLoaded', init);
 }
 
-// v10-no-groups-focus-save
+// v11-edit-trades-notes-goals
