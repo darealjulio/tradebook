@@ -892,7 +892,7 @@ async function handleSave() {
     state.journal.push(entry);
     await dbPut('journal', entry);
   }
-  } else if (mode === 'edit-trade') {
+  if (mode === 'edit-trade') {
     var orig = state.editingTrade;
     if (orig) {
       var updated = {
@@ -929,6 +929,7 @@ async function handleSave() {
       }
       state.editingTrade = null;
     }
+  }
   state.modal = null;
   render();
 
