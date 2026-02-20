@@ -631,7 +631,7 @@ function renderModal() {
       + [1,2,3,4,5].map(function(n) { return '<button class="star-btn" data-star="'+n+'" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:'+(n<=4?'var(--amber)':'var(--bg-0)')+';color:'+(n<=4?'#000':'var(--text-3)')+';font-weight:800;font-size:0.75rem;cursor:pointer;font-family:var(--font)">\u2605</button>'; }).join('')
       + '</div></div>'
       + '</div>'
-        '<div class="form-group"><label class="form-label">Notes / Setup</label><textarea class="textarea" id="m-notes" rows="2" placeholder="Entry reason, setup quality, lessons..."></textarea></div>' +
+      + '<div class="form-group"><label class="form-label">Notes / Setup</label><textarea class="textarea" id="m-notes" rows="2" placeholder="Entry reason, setup quality, lessons..."></textarea></div>'
       + '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Back</button><button class="btn btn-primary" style="flex:2" id="m-save">Save Trade</button></div>'
       + '</div>';
   } else if (state.modal === 'edit-trade') {
@@ -655,9 +655,9 @@ function renderModal() {
         '<div class="form-group"><label class="form-label">Entry</label><input type="number" step="0.01" class="input mono" id="m-entry" value="' + (t.entry||0) + '"></div>' +
         '<div class="form-group"><label class="form-label">Exit</label><input type="number" step="0.01" class="input mono" id="m-exit" value="' + (t.exit||0) + '"></div>' +
         '</div>' +
-        '<div class="form-group"><label class="form-label">Notes / Setup</label><textarea class="textarea" id="m-notes" rows="2" placeholder="Entry reason, setup quality...">' + esc(t.notes||'') + '</textarea></div>' +
-        '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Cancel</button><button class="btn btn-primary" style="flex:2" id="m-save">Update Trade</button></div>' +
-        '</div>';
+        + '<div class="form-group"><label class="form-label">Notes / Setup</label><textarea class="textarea" id="m-notes" rows="2" placeholder="Entry reason, setup quality...">' + esc(t.notes||'') + '</textarea></div>' +
+        + '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Cancel</button><button class="btn btn-primary" style="flex:2" id="m-save">Update Trade</button></div>' +
+        + '</div>';
     }
   } else if (state.modal === 'journal') {
     content = '<h3 class="heading-lg" style="margin-bottom:12px">\u270D\uFE0F Journal Entry</h3>'
