@@ -308,3 +308,108 @@ function bindStrategySelect(selectId) {
     }
   });
 }
+
+
+// ——— P&L Goal Tracker ———
+function getPnlGoals() {
+  try { return JSON.parse(localStorage.getItem('tb_pnl_goals') || '{}'); }
+  catch(e) { return {}; }
+}
+function savePnlGoals(goals) {
+  localStorage.setItem('tb_pnl_goals', JSON.stringify(goals));
+}
+function renderPnlGoals(daily) {
+  var goals = getPnlGoals();
+  var dailyGoal = parseFloat(goals.daily) || 0;
+  var monthlyGoal = parseFloat(goals.monthly) || 0;
+
+  // Today's P&L
+  var todayStr = new Date().toISOString().split('T')[0];
+  var todayEntry = (daily || []).find(function(d) { return d.date === todayStr; });
+  var todayPnl = todayEntry ? todayEntry.pnl : 0;
+
+  // This month's P&L
+  var monthPrefix = todayStr.slice(0, 7);
+  var monthPnl = (daily || [])
+    .filter(function(d) { return d.date.startsWith(monthPrefix); })
+    .reduce(function(s, d) { return s + d.pnl; }, 0);
+
+  var dayPct = dailyGoal > 0 ? Math.min(100, Math.round((todayPnl / dailyGoal) * 100)) : null;
+  var monPct = monthlyGoal > 0 ? Math.min(100, Math.round((monthPnl / monthlyGoal) * 100)) : null;
+
+  var fmt2 = function(v) {
+    var abs = Math.abs(v);
+    var s = abs >= 1000 ? (abs / 1000).toFixed(1) + 'K' : abs.toLocaleString(undefined, { minimumFractionDigits: 0 });
+    return (v >= 0 ? '+$' : '-$') + s;
+  };
+
+  var goalBar = function(pct, color) {
+    var safe = Math.max(0, Math.min(100, pct));
+    return '<div style="height:6px;background:var(--bg-0);border-radius:3px;margin-top:6px"><div style="height:100%;width:' + safe + '%;background:' + color + ';border-radius:3px;transition:width 0.3s"></div></div>';
+  };
+
+  var editId = 'goals-edit-btn';
+  var formId = 'goals-form';
+  var saveId = 'goals-save-btn';
+
+  return '<div class="card" id="pnl-goals-card">' +
+    '<div class="row between" style="margin-bottom:10px">' +
+    '<p class="label">\uD83C\uDFAF P&L Goals</p>' +
+    '<button class="btn btn-secondary" id="' + editId + '" style="font-size:0.625rem;padding:4px 10px">Edit</button>' +
+    '</div>' +
+    '<div id="' + formId + '" style="display:none;margin-bottom:10px">' +
+    '<div class="grid-2" style="gap:6px;margin-bottom:6px">' +
+    '<div class="form-group"><label class="form-label">Daily Goal ($)</label>' +
+    '<input type="number" class="input mono" id="goal-daily-input" value="' + (dailyGoal || '') + '" placeholder="500"></div>' +
+    '<div class="form-group"><label class="form-label">Monthly Goal ($)</label>' +
+    '<input type="number" class="input mono" id="goal-monthly-input" value="' + (monthlyGoal || '') + '" placeholder="5000"></div>' +
+    '</div>' +
+    '<button class="btn btn-primary" id="' + saveId + '" style="width:100%;font-size:0.75rem">Save Goals</button>' +
+    '</div>' +
+    '<div class="grid-2">' +
+    // Daily
+    '<div style="background:var(--bg-0);border-radius:8px;padding:10px;border:1px solid var(--border)">' +
+    '<p class="text-dim" style="font-size:0.5625rem;margin-bottom:2px">Today</p>' +
+    '<p class="mono" style="font-size:0.9375rem;font-weight:900;color:' + (todayPnl >= 0 ? 'var(--green)' : 'var(--red)') + '">' + fmt2(todayPnl) + '</p>' +
+    (dailyGoal > 0 ?
+      '<p class="text-dim" style="font-size:0.5625rem;margin-top:2px">Goal: $' + dailyGoal.toLocaleString() + '</p>' +
+      goalBar(dayPct, dayPct >= 100 ? '#10b981' : dayPct >= 50 ? '#f59e0b' : '#3b82f6') +
+      '<p class="text-dim" style="font-size:0.5rem;margin-top:3px">' + dayPct + '% of goal</p>'
+    : '<p class="text-dim" style="font-size:0.5625rem;margin-top:4px">No goal set</p>') +
+    '</div>' +
+    // Monthly
+    '<div style="background:var(--bg-0);border-radius:8px;padding:10px;border:1px solid var(--border)">' +
+    '<p class="text-dim" style="font-size:0.5625rem;margin-bottom:2px">This Month</p>' +
+    '<p class="mono" style="font-size:0.9375rem;font-weight:900;color:' + (monthPnl >= 0 ? 'var(--green)' : 'var(--red)') + '">' + fmt2(monthPnl) + '</p>' +
+    (monthlyGoal > 0 ?
+      '<p class="text-dim" style="font-size:0.5625rem;margin-top:2px">Goal: $' + monthlyGoal.toLocaleString() + '</p>' +
+      goalBar(monPct, monPct >= 100 ? '#10b981' : monPct >= 50 ? '#f59e0b' : '#3b82f6') +
+      '<p class="text-dim" style="font-size:0.5rem;margin-top:3px">' + monPct + '% of goal</p>'
+    : '<p class="text-dim" style="font-size:0.5625rem;margin-top:4px">No goal set</p>') +
+    '</div>' +
+    '</div></div>';
+}
+function bindPnlGoals() {
+  var editBtn = document.getElementById('goals-edit-btn');
+  var form = document.getElementById('goals-form');
+  var saveBtn = document.getElementById('goals-save-btn');
+  if (editBtn && form) {
+    editBtn.addEventListener('click', function() {
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      editBtn.textContent = form.style.display === 'none' ? 'Edit' : 'Cancel';
+    });
+  }
+  if (saveBtn) {
+    saveBtn.addEventListener('click', function() {
+      var dv = parseFloat(document.getElementById('goal-daily-input').value) || 0;
+      var mv = parseFloat(document.getElementById('goal-monthly-input').value) || 0;
+      savePnlGoals({ daily: dv, monthly: mv });
+      // Re-render just this card
+      var card = document.getElementById('pnl-goals-card');
+      if (card && typeof state !== 'undefined') {
+        card.outerHTML = renderPnlGoals(state.daily);
+        bindPnlGoals();
+      }
+    });
+  }
+}
