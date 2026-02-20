@@ -263,6 +263,7 @@ function renderExportSection() {
     '<button class="btn btn-secondary" style="font-size:0.6875rem;padding:10px" id="export-trades-btn">\u{1F4C8} Trades</button>' +
     '<button class="btn btn-secondary" style="font-size:0.6875rem;padding:10px" id="export-journal-btn">\u270D\uFE0F Journal</button>' +
     '<button class="btn btn-primary" style="font-size:0.6875rem;padding:10px" id="export-all-btn">\u{1F4E6} Export All</button>' +
+    '<button class="btn btn-secondary" style="width:100%;margin-top:6px;font-size:0.6875rem;padding:10px" id="sync-totals-btn">\uD83D\uDD04 Sync Daily Totals from Trades</button>' +
     '</div></div>';
 }
 
@@ -278,6 +279,48 @@ function bindExportButtons() {
     exportDailyCSV(state.daily);
     setTimeout(function() { exportTradesCSV(state.trades); }, 300);
     setTimeout(function() { exportJournalCSV(state.journal); }, 600);
+  });
+  var eb5 = document.getElementById('sync-totals-btn');
+  if (eb5) eb5.addEventListener('click', async function() {
+    if (typeof state === 'undefined' || !state.trades) return;
+    eb5.disabled = true;
+    eb5.textContent = 'Syncing...';
+    // Group all trades by date
+    var tradesByDate = {};
+    state.trades.forEach(function(t) {
+      if (!t.date) return;
+      if (!tradesByDate[t.date]) tradesByDate[t.date] = [];
+      tradesByDate[t.date].push(t);
+    });
+    // For each date, recalculate and update daily entry
+    var updated = 0;
+    for (var dateStr in tradesByDate) {
+      var dayTrades = tradesByDate[dateStr];
+      var dayPnl = dayTrades.reduce(function(s, t) { return s + (t.pnl || 0); }, 0);
+      var dayWins = dayTrades.filter(function(t) { return t.pnl > 0; }).length;
+      var dayLosses = dayTrades.filter(function(t) { return t.pnl < 0; }).length;
+      var existingDaily = state.daily.find(function(d) { return d.date === dateStr; });
+      if (existingDaily) {
+        existingDaily.pnl = dayPnl;
+        existingDaily.trades = dayTrades.length;
+        existingDaily.wins = dayWins;
+        existingDaily.losses = dayLosses;
+        if (typeof dbPut === 'function') await dbPut('daily', existingDaily);
+        updated++;
+      }
+    }
+    // Also remove any auto daily entries that have no trades
+    var toRemove = state.daily.filter(function(d) {
+      return d.id && d.id.toString().startsWith('auto_') && !tradesByDate[d.date];
+    });
+    for (var i = 0; i < toRemove.length; i++) {
+      state.daily = state.daily.filter(function(x) { return x.id !== toRemove[i].id; });
+      if (typeof dbDelete === 'function') await dbDelete('daily', toRemove[i].id);
+    }
+    if (typeof render === 'function') render();
+    eb5.disabled = false;
+    eb5.textContent = '\u2705 Synced ' + updated + ' days!';
+    setTimeout(function() { eb5.textContent = '\uD83D\uDD04 Sync Daily Totals from Trades'; }, 3000);
   });
 }
 
