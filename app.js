@@ -536,8 +536,31 @@ function renderDetail() {
   $$('[data-delete-trade]').forEach(function(btn) {
     btn.addEventListener('click', async function() {
       var id = btn.dataset.deleteTrade;
+      var tradeToDelete = state.trades.find(function(t) { return t.id === id; });
       state.trades = state.trades.filter(function(x) { return x.id !== id; });
       await dbDelete('trades', id);
+      // Recalculate daily totals after trade deletion
+      if (tradeToDelete) {
+        var tradeDate = tradeToDelete.date;
+        var remainingTrades = state.trades.filter(function(t) { return t.date === tradeDate; });
+        var dayPnl = remainingTrades.reduce(function(s, t) { return s + (t.pnl || 0); }, 0);
+        var dayWins = remainingTrades.filter(function(t) { return t.pnl > 0; }).length;
+        var dayLosses = remainingTrades.filter(function(t) { return t.pnl < 0; }).length;
+        var existingDaily = state.daily.find(function(d) { return d.date === tradeDate; });
+        if (existingDaily) {
+          if (remainingTrades.length === 0 && existingDaily.id && existingDaily.id.toString().startsWith('auto_')) {
+            // Auto-created daily entry with no trades left — remove it
+            state.daily = state.daily.filter(function(d) { return d.date !== tradeDate; });
+            await dbDelete('daily', existingDaily.id);
+          } else {
+            existingDaily.pnl = dayPnl;
+            existingDaily.trades = remainingTrades.length;
+            existingDaily.wins = dayWins;
+            existingDaily.losses = dayLosses;
+            await dbPut('daily', existingDaily);
+          }
+        }
+      }
       state.viewing = { entry: e, type: 'calday' };
       render();
     });
@@ -725,6 +748,34 @@ function bindEvents() {
     });
     var sheet = $('#modal-sheet');
     if (sheet) sheet.addEventListener('click', function(e) { e.stopPropagation(); });
+    // Swipe-down to dismiss modal (iOS feel)
+    if (sheet) {
+      var swipeStartY = 0;
+      sheet.addEventListener('touchstart', function(e) {
+        swipeStartY = e.touches[0].clientY;
+      }, { passive: true });
+      sheet.addEventListener('touchmove', function(e) {
+        var dy = e.touches[0].clientY - swipeStartY;
+        if (dy > 0) {
+          sheet.style.transform = 'translateY(' + Math.min(dy, 200) + 'px)';
+          sheet.style.transition = 'none';
+        }
+      }, { passive: true });
+      sheet.addEventListener('touchend', function(e) {
+        var dy = e.changedTouches[0].clientY - swipeStartY;
+        if (dy > 80) {
+          sheet.style.transition = 'transform 0.2s ease';
+          sheet.style.transform = 'translateY(100%)';
+          setTimeout(function() {
+            state.modal = null;
+            render();
+          }, 200);
+        } else {
+          sheet.style.transition = 'transform 0.2s ease';
+          sheet.style.transform = '';
+        }
+      });
+    }
   }
 
   // picker buttons
@@ -966,4 +1017,4 @@ if (typeof sb === 'undefined') {
   document.addEventListener('DOMContentLoaded', init);
 }
 
-// v11-edit-trades-notes-goals
+// v12-delete-recalc-swipe-dismiss
