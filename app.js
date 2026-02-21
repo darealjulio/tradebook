@@ -218,6 +218,7 @@ function render() {
   if (typeof window.TradeBookAnalytics !== 'undefined' && state.tab === 'overview') {
     window.TradeBookAnalytics.initAll(state.daily);
   }
+  if (typeof hideSplash === 'function') hideSplash();
 }
 
 function computeStats() {
