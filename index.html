@@ -22,6 +22,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   </head>
   <body>
+  <div id="splash-screen" style="position:fixed;inset:0;z-index:9999;background:#050d0f;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s ease;pointer-events:none;">
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-align:center;">
+      <div style="font-size:2.5rem;font-weight:700;color:#ffffff;letter-spacing:-0.02em;margin-bottom:0.25rem;">TradeBook</div>
+      <div style="font-size:0.75rem;letter-spacing:0.2em;color:#6b7280;text-transform:uppercase;">Trading Journal</div>
+    </div>
+  </div>
+  <style>
+    #splash-screen.hidden { opacity: 0; pointer-events: none; }
+  </style>
+  <script>
+    function hideSplash() {
+      var s = document.getElementById('splash-screen');
+      if (s) { s.classList.add('hidden'); setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 600); }
+    }
+    // Fallback: hide after 5s in case app never calls it
+    setTimeout(hideSplash, 5000);
+  </script>
     <div id="app"></div>
     <!-- Auth loads first, checks session, then loads app -->
     <script src="/auth.js"></script>
