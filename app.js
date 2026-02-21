@@ -215,6 +215,9 @@ function render() {
   `;
   bindEvents();
   if (state.tab === 'overview') initCharts(stats);
+  if (typeof window.TradeBookAnalytics !== 'undefined' && state.tab === 'overview') {
+    window.TradeBookAnalytics.initAll(state.daily);
+  }
 }
 
 function computeStats() {
@@ -306,7 +309,8 @@ function renderOverview(s) {
       ${typeof renderMonthlyRecap === 'function' ? renderMonthlyRecap(state.daily, state.trades, state.journal) : ''}
       ${typeof renderExportSection === 'function' ? renderExportSection() : ''}
 
-    ${typeof renderPnlGoals === 'function' ? renderPnlGoals(state.daily) : ''}
+    ${typeof renderPnlGoals === 'fu
+    ${typeof window.TradeBookAnalytics !== 'undefined' ? window.TradeBookAnalytics.renderAll(state.daily) : ''}nction' ? renderPnlGoals(state.daily) : ''}
     ${typeof window.TradeBookCoach !== 'undefined' ? window.TradeBookCoach.renderCoachCard() : ''}    </div>
   `;
 }
