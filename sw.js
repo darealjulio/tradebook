@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tradebook-v14';
+const CACHE_NAME = 'tradebook-v15';
 const ASSETS = [
   '/',
   '/index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   '/auth.js',
   '/features.js',
   '/coach.js',
+  '/analytics.js',
   '/icons/icon-512.png',
   'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,400&family=JetBrains+Mono:wght@500;700&display=swap'
 ];
