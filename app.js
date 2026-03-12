@@ -312,7 +312,7 @@ function renderOverview(s) {
 
     ${typeof renderPnlGoals === 'function' ? renderPnlGoals(state.daily) : ''}
     ${typeof window.TradeBookAnalytics !== 'undefined' ? window.TradeBookAnalytics.renderAll(state.daily) : ''}
-    ${typeof window.TradeBookCoach !== 'undefined' ? window.TradeBookCoach.renderCoachCard() : ''}
+
   </div>
   `;
 }
@@ -869,10 +869,6 @@ function bindEvents() {
   if (typeof bindPnlGoals === 'function' && state.tab === 'overview') {
     bindPnlGoals();
   }
-  // Bind AI Coach (coach.js)
-  if (typeof window.TradeBookCoach !== 'undefined' && state.tab === 'overview') {
-    window.TradeBookCoach.bindCoachEvents(state.daily, state.trades, state.journal);
-  }
 }
 
 async function handleSave() {
@@ -1015,7 +1011,7 @@ async function init() {
   state.trades = results[1];
   state.journal = results[2];
     state.loaded = true;
-  if (typeof window.TradeBookCoach !== 'undefined') window.TradeBookCoach.initCoach(); 
+
 
 
   render();
