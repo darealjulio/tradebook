@@ -1,6 +1,6 @@
 # TradeBook — Complete App Replica Prompt
 
-Build an exact replica of **TradeBook**, a mobile-first Progressive Web App (PWA) trading journal for day traders. The entire app is built with **vanilla JavaScript** (no frameworks, no build tools, no npm). It uses **IndexedDB** for offline-first local storage, **Supabase** for cloud sync and authentication, **Chart.js** for data visualization, and the **Claude API** for AI-powered trade coaching.
+Build an exact replica of **TradeBook**, a mobile-first Progressive Web App (PWA) trading journal for day traders. The entire app is built with **vanilla JavaScript** (no frameworks, no build tools, no npm). It uses **IndexedDB** for offline-first local storage, **Supabase** for cloud sync and authentication, and **Chart.js** for data visualization.
 
 ---
 
@@ -15,7 +15,6 @@ Create the following flat file structure (no subdirectories except `/icons/`):
 ├── auth.js             # Supabase authentication module
 ├── app.js              # Core application (~1000 lines)
 ├── features.js         # Streaks, strategies, CSV export, goals, rule violations
-├── coach.js            # AI Trade Coach (Claude API integration)
 ├── analytics.js        # Advanced analytics (drawdown, distribution, risk metrics)
 ├── sw.js               # Service Worker for offline caching
 ├── manifest.json       # PWA manifest
@@ -38,7 +37,7 @@ Create a minimal SPA shell:
   - Supabase JS 2.x: `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js`
 - **Splash screen**: A fixed overlay (`#splash-screen`) with dark background `#050d0f`, centered "TradeBook" heading (2.5rem, weight 700) and "Trading Journal" subtitle (0.75rem, uppercase, letter-spacing 0.2em, color #6b7280). The splash fades out (opacity transition 0.5s) via a `hideSplash()` function that adds a `.hidden` class and removes the element after 600ms. Fallback: auto-hide after 5 seconds.
 - **`<div id="app"></div>`** — the single mount point
-- **Script loading order in `<body>`**: auth.js → app.js → features.js → coach.js → analytics.js
+- **Script loading order in `<body>`**: auth.js → app.js → features.js → analytics.js
 
 ---
 
@@ -65,8 +64,8 @@ Create a minimal SPA shell:
 
 ## 4. SERVICE WORKER (sw.js)
 
-- Cache name: `tradebook-v16`
-- Pre-cache assets: `/`, `/index.html`, `/app.js`, `/styles.css`, `/manifest.json`, `/auth.js`, `/features.js`, `/coach.js`, `/analytics.js`, both icon files, and the Google Fonts CSS URL
+- Cache name: `tradebook-v17`
+- Pre-cache assets: `/`, `/index.html`, `/app.js`, `/styles.css`, `/manifest.json`, `/auth.js`, `/features.js`, `/analytics.js`, both icon files, and the Google Fonts CSS URL
 - **Install**: Cache all assets, call `self.skipWaiting()`
 - **Activate**: Delete old caches, call `self.clients.claim()`
 - **Fetch**: Cache-first strategy — serve cached version if available, otherwise fetch from network and cache the response (GET requests only, `res.ok` check). On network failure, fall back to cache.
@@ -362,7 +361,6 @@ Renders a vertical stack of cards:
    - Export section
    - P&L goals card
    - Analytics cards (drawdown, day-of-week, distribution, risk metrics, rolling, trade size)
-   - AI Coach card
 
 ### Calendar Tab (`renderCalendar()`)
 - Month/year navigation with prev/next buttons (can't go past current month)
@@ -502,7 +500,7 @@ After saving a trade, **auto-update daily totals**: find or create a daily entry
 - Journal card clicks → view journal detail
 - Calendar nav (prev/next month)
 - Calendar day clicks → view calday detail
-- Feature bindings: export buttons, strategy select, P&L goals, AI coach
+- Feature bindings: export buttons, strategy select, P&L goals
 
 ### Init Function
 ```javascript
@@ -514,7 +512,6 @@ async function init() {
   state.trades = trades;
   state.journal = journal;
   state.loaded = true;
-  if (window.TradeBookCoach) window.TradeBookCoach.initCoach();
   render();
 }
 ```
@@ -585,86 +582,7 @@ If no auth module (`sb` undefined), boot via `DOMContentLoaded`.
 
 ---
 
-## 9. COACH.JS — AI Trade Coach (Claude API)
-
-Wrapped in an IIFE assigned to `window.TradeBookCoach`:
-
-### State
-```javascript
-var coachState = { apiKey: null, analysis: null, loading: false, error: null };
-```
-
-### API Key Management
-- Stored in `localStorage` key `tb_claude_api_key`
-- `getApiKey()` / `saveApiKey(key)`
-
-### Context Builder (`buildContext(daily, trades, journal)`)
-Builds a text prompt from the last 30 days of trading data:
-- Stats summary: Net P&L, Win Rate, Green/Red days, Total trades
-- Strategy breakdown: Each strategy with P&L, count, WR%
-- Emotion/P&L correlation: Each emotion with trade count and avg P&L
-- Recent bad days: Date, P&L, post-market notes
-- Recent journal entries: Date, category, truncated body (200 chars)
-- System instruction: "You are an elite trading coach analyzing a trader journal. Be direct, specific, actionable. Use their actual numbers."
-
-### Claude API Call (`callClaude(prompt, daily, trades, journal)`)
-```javascript
-fetch('https://api.anthropic.com/v1/messages', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': key,
-    'anthropic-version': '2023-06-01',
-    'anthropic-dangerous-direct-browser-access': 'true',
-  },
-  body: JSON.stringify({
-    model: 'claude-sonnet-4-5',
-    max_tokens: 1024,
-    messages: [{ role: 'user', content: context + '\n\n---\n\nQuestion: ' + prompt }],
-  }),
-});
-```
-
-### Coach UI (`renderCoachCard()`)
-- Card with indigo border (`rgba(99,102,241,0.3)`)
-- Header: 🧠 AI Trade Coach + API key button ("🔑 Key Set ✓" or "🔑 Add Key")
-- If no key: info box about getting a key at console.anthropic.com
-- **Quick-tap buttons** (wrapped flex, 20px radius pills):
-  - 💪 "What's my biggest edge?"
-  - 🔴 "What are my worst habits?"
-  - 📋 "Rules for this week"
-  - 🧘 "Emotional patterns"
-  - 📊 "Strategy review"
-  - 🏆 "Best vs worst days"
-- Custom question input + "Ask" button
-- Response area: Loading spinner (CSS animation, indigo top-border), error box (red), or analysis text (pre-wrap in bordered container with Clear button)
-
-### Coach Events (`bindCoachEvents()`)
-- Key button: prompt for API key
-- Quick-tap buttons: trigger `runAnalysis()` with button text
-- Ask button + Enter key: trigger with input value
-- Clear button: reset analysis state, re-render
-
-### Coach Styles (injected via JS)
-```css
-.coach-spinner {
-  width: 16px; height: 16px;
-  border: 2px solid var(--border);
-  border-top-color: #6366f1;
-  border-radius: 50%;
-  animation: coach-spin 0.7s linear infinite;
-}
-@keyframes coach-spin { to { transform: rotate(360deg); } }
-```
-
-### Public API
-```javascript
-return { initCoach, renderCoachCard, bindCoachEvents };
-```
-
----
-
-## 10. ANALYTICS.JS — Advanced Analytics Module
+## 9. ANALYTICS.JS — Advanced Analytics Module
 
 Exposed as `window.TradeBookAnalytics` with `renderAll(daily)` and `initAll(daily)` methods.
 
@@ -715,7 +633,7 @@ All analytics cards require minimum 5 daily entries to render (graceful degradat
 
 ---
 
-## 11. DATA SCHEMAS
+## 10. DATA SCHEMAS
 
 ### Daily Entry
 ```javascript
@@ -766,7 +684,7 @@ All analytics cards require minimum 5 daily entries to render (graceful degradat
 
 ---
 
-## 12. SUPABASE SCHEMA
+## 11. SUPABASE SCHEMA
 
 ### Tables
 
@@ -825,7 +743,7 @@ All tables should have RLS enabled with policies that restrict SELECT, INSERT, U
 
 ---
 
-## 13. KEY BEHAVIORAL DETAILS
+## 12. KEY BEHAVIORAL DETAILS
 
 1. **Offline-first**: Always save to IndexedDB immediately, then attempt Supabase sync in background. Silent failures on cloud sync.
 2. **Auto daily totals**: When saving a trade, automatically create or update the daily entry for that date by summing all trades.
@@ -840,7 +758,7 @@ All tables should have RLS enabled with policies that restrict SELECT, INSERT, U
 
 ---
 
-## 14. VISUAL DESIGN SPECIFICATIONS
+## 13. VISUAL DESIGN SPECIFICATIONS
 
 - **Theme**: Ultra-dark (near-black backgrounds), high contrast with green/red accents
 - **Primary action color**: Green gradient (#10b981 → #059669)
