@@ -15,7 +15,6 @@ Create the following flat file structure (no subdirectories except `/icons/`):
 ├── auth.js             # Supabase authentication module
 ├── app.js              # Core application (~1000 lines)
 ├── features.js         # Streaks, strategies, CSV export, goals, rule violations
-├── analytics.js        # Advanced analytics (drawdown, distribution, risk metrics)
 ├── sw.js               # Service Worker for offline caching
 ├── manifest.json       # PWA manifest
 └── icons/
@@ -37,7 +36,7 @@ Create a minimal SPA shell:
   - Supabase JS 2.x: `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js`
 - **Splash screen**: A fixed overlay (`#splash-screen`) with dark background `#050d0f`, centered "TradeBook" heading (2.5rem, weight 700) and "Trading Journal" subtitle (0.75rem, uppercase, letter-spacing 0.2em, color #6b7280). The splash fades out (opacity transition 0.5s) via a `hideSplash()` function that adds a `.hidden` class and removes the element after 600ms. Fallback: auto-hide after 5 seconds.
 - **`<div id="app"></div>`** — the single mount point
-- **Script loading order in `<body>`**: auth.js → app.js → features.js → analytics.js
+- **Script loading order in `<body>`**: auth.js → app.js → features.js
 
 ---
 
@@ -65,7 +64,7 @@ Create a minimal SPA shell:
 ## 4. SERVICE WORKER (sw.js)
 
 - Cache name: `tradebook-v17`
-- Pre-cache assets: `/`, `/index.html`, `/app.js`, `/styles.css`, `/manifest.json`, `/auth.js`, `/features.js`, `/analytics.js`, both icon files, and the Google Fonts CSS URL
+- Pre-cache assets: `/`, `/index.html`, `/app.js`, `/styles.css`, `/manifest.json`, `/auth.js`, `/features.js`, both icon files, and the Google Fonts CSS URL
 - **Install**: Cache all assets, call `self.skipWaiting()`
 - **Activate**: Delete old caches, call `self.clients.claim()`
 - **Fetch**: Cache-first strategy — serve cached version if available, otherwise fetch from network and cache the response (GET requests only, `res.ok` check). On network failure, fall back to cache.
@@ -329,7 +328,7 @@ The `render()` function rebuilds the entire DOM on every state change:
    - Tab content: `renderOverview()`, `renderCalendar()`, or `renderJournal()`
    - FAB button ("+")
    - Modal (if `state.modal` is set)
-4. After render: call `bindEvents()`, `initCharts()`, analytics init, and `hideSplash()`
+4. After render: call `bindEvents()`, `initCharts()`, and `hideSplash()`
 
 ### `computeStats()` — Statistics Engine
 From `state.daily` array, compute:
@@ -360,7 +359,6 @@ Renders a vertical stack of cards:
    - Monthly recap card
    - Export section
    - P&L goals card
-   - Analytics cards (drawdown, day-of-week, distribution, risk metrics, rolling, trade size)
 
 ### Calendar Tab (`renderCalendar()`)
 - Month/year navigation with prev/next buttons (can't go past current month)
@@ -582,58 +580,7 @@ If no auth module (`sb` undefined), boot via `DOMContentLoaded`.
 
 ---
 
-## 9. ANALYTICS.JS — Advanced Analytics Module
-
-Exposed as `window.TradeBookAnalytics` with `renderAll(daily)` and `initAll(daily)` methods.
-
-### Drawdown Analysis
-- `computeDrawdown(dailyEntries)`: Track cumulative P&L, peak, max drawdown, current drawdown, days in drawdown
-- `renderDrawdownCard()`: 3-column stats (Max DD, Current DD, Days in DD) + line chart
-- `initDrawdownChart()`: Red line chart with red fill (15% opacity), no point radius
-
-### Day-of-Week Performance
-- `computeDayOfWeek(dailyEntries)`: For each day (Sun-Sat), compute total P&L, wins, losses, avgPnl, winRate
-- `renderDayOfWeekCard()`: Best/worst day callout + bar chart + win rate row for trading days (Mon-Fri)
-- `initDayOfWeekChart()`: Green/red bar chart by day
-
-### P&L Distribution
-- `computeDistribution(dailyEntries)`: Calculate mean, median, std dev, skew direction. Create histogram buckets (max 10).
-- `renderDistributionCard()`: 3-column stats (Mean, Median, Std Dev) + histogram chart + skew description
-- `initDistributionChart()`: Green/red bar chart based on bucket sign
-
-### Risk Metrics
-- `computeRiskMetrics(dailyEntries)`: Calculate:
-  - **Sharpe Ratio**: `(mean / stdDev) * sqrt(252)` (annualized)
-  - **Sortino Ratio**: `(mean / downsideDev) * sqrt(252)` (downside only)
-  - **Expectancy/Day**: `(winRate * avgWin) - ((1-winRate) * avgLoss)`
-  - **Payoff Ratio**: `avgWin / avgLoss`
-  - **Win Rate** and **Daily Volatility**
-- `renderRiskMetricsCard()`: Table of metrics with color-coded values and targets
-- Color logic: `metricColor(val, [lowThreshold, highThreshold])` → red/amber/green
-
-### Rolling Performance (5-Day Window)
-- `computeRolling(dailyEntries, windowDays)`: Sliding window P&L, win rate, green day percentage
-- `renderRollingCard()`: Trend indicator (↗ Improving / ↘ Declining) + line chart
-- `initRollingChart()`: Multi-colored line using Chart.js `segment` option (green when positive, red when negative, amber at crossover)
-
-### Trade Count vs P&L Correlation
-- `computeTradeSizeCorrelation(dailyEntries)`: Pearson correlation coefficient between trade count and P&L, green day avg trades, red day avg trades, interpretation text
-- `renderTradeSizeCard()`: 3-column stats (Correlation, Green Day Avg, Red Day Avg) + interpretation box
-
-### Public API
-```javascript
-window.TradeBookAnalytics = {
-  renderAll(daily) { /* returns concatenated HTML strings of all cards */ },
-  initAll(daily) { /* initializes all Chart.js instances */ },
-  // Plus individual render/init functions
-};
-```
-
-All analytics cards require minimum 5 daily entries to render (graceful degradation with empty string return).
-
----
-
-## 10. DATA SCHEMAS
+## 9. DATA SCHEMAS
 
 ### Daily Entry
 ```javascript
@@ -684,7 +631,7 @@ All analytics cards require minimum 5 daily entries to render (graceful degradat
 
 ---
 
-## 11. SUPABASE SCHEMA
+## 10. SUPABASE SCHEMA
 
 ### Tables
 
@@ -743,7 +690,7 @@ All tables should have RLS enabled with policies that restrict SELECT, INSERT, U
 
 ---
 
-## 12. KEY BEHAVIORAL DETAILS
+## 11. KEY BEHAVIORAL DETAILS
 
 1. **Offline-first**: Always save to IndexedDB immediately, then attempt Supabase sync in background. Silent failures on cloud sync.
 2. **Auto daily totals**: When saving a trade, automatically create or update the daily entry for that date by summing all trades.
@@ -758,7 +705,7 @@ All tables should have RLS enabled with policies that restrict SELECT, INSERT, U
 
 ---
 
-## 13. VISUAL DESIGN SPECIFICATIONS
+## 12. VISUAL DESIGN SPECIFICATIONS
 
 - **Theme**: Ultra-dark (near-black backgrounds), high contrast with green/red accents
 - **Primary action color**: Green gradient (#10b981 → #059669)
