@@ -465,8 +465,8 @@ function renderDetail() {
             + (t.exit ? '<span class="text-dim" style="font-size:0.625rem">Exit: '+t.exit+'</span>' : '')
             + '</div>'
             + '<button class="btn-danger-sm" data-delete-trade="'+t.id+'">Delete trade</button>'
-        '<button class="btn btn-secondary" style="margin-left:6px;font-size:0.6875rem;padding:4px 10px" data-edit-trade="' + t.id + '">Edit</button>' +
-        (t.notes ? '<p class="text-dim" style="font-size:0.6875rem;margin-top:4px;font-style:italic">\uD83D\uDCDD ' + esc(t.notes) + '</p>' : '') +
+            + '<button class="btn btn-secondary" style="margin-left:6px;font-size:0.6875rem;padding:4px 10px" data-edit-trade="' + t.id + '">Edit</button>'
+            + (t.notes ? '<p class="text-dim" style="font-size:0.6875rem;margin-top:4px;font-style:italic">\uD83D\uDCDD ' + esc(t.notes) + '</p>' : '')
             + '</div>';
         }).join('')
       + '</div></div>';
@@ -662,9 +662,9 @@ function renderModal() {
         '<div class="form-group"><label class="form-label">Entry</label><input type="number" step="0.01" class="input mono" id="m-entry" value="' + (t.entry||0) + '"></div>' +
         '<div class="form-group"><label class="form-label">Exit</label><input type="number" step="0.01" class="input mono" id="m-exit" value="' + (t.exit||0) + '"></div>' +
         '</div>' +
-        + '<div class="form-group"><label class="form-label">Notes / Setup</label><textarea class="textarea" id="m-notes" rows="2" placeholder="Entry reason, setup quality...">' + esc(t.notes||'') + '</textarea></div>' +
-        + '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Cancel</button><button class="btn btn-primary" style="flex:2" id="m-save">Update Trade</button></div>' +
-        + '</div>';
+        '<div class="form-group"><label class="form-label">Notes / Setup</label><textarea class="textarea" id="m-notes" rows="2" placeholder="Entry reason, setup quality...">' + esc(t.notes||'') + '</textarea></div>' +
+        '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Cancel</button><button class="btn btn-primary" style="flex:2" id="m-save">Update Trade</button></div>' +
+        '</div>';
     }
   } else if (state.modal === 'journal') {
     content = '<h3 class="heading-lg" style="margin-bottom:12px">\u270D\uFE0F Journal Entry</h3>'
@@ -876,6 +876,11 @@ function bindEvents() {
 }
 
 async function handleSave() {
+  // Disable save button to prevent double-clicks during async save
+  var saveBtn = $('#m-save');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+
+  try {
   var mode = state.modal;
   if (mode === 'daily') {
     var entry = {
@@ -992,13 +997,11 @@ async function handleSave() {
       state.editingTrade = null;
     }
   }
+  } catch (err) {
+    console.error('Save failed:', err);
+  }
   state.modal = null;
   render();
-
-
-
-
-
 }
 
 // ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Init ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
