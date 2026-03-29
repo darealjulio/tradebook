@@ -239,39 +239,39 @@ function computeStats() {
 
 // ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Overview Tab ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
 function renderOverview(s) {
-  const ringR = 34, circ = 2*Math.PI*ringR, filled = (s.winRate/100)*circ;
+  const ringR = 24, circ = 2*Math.PI*ringR, filled = (s.winRate/100)*circ;
   return `
     <div class="stack">
       <div class="grid-2">
         <div class="card card-green">
           <p class="label" style="margin-bottom:6px">Net P&L</p>
-          <p class="mono text-green" style="font-size:1.375rem;font-weight:900">${fmtK(s.netPnl)}</p>
+          <p class="mono text-green" style="font-size:1.25rem;font-weight:900">${fmtK(s.netPnl)}</p>
           <p class="text-dim" style="font-size:0.625rem;margin-top:4px">${s.totalTrades} trades \u00B7 ${s.days} days</p>
         </div>
         <div class="card">
-          <p class="label" style="margin-bottom:8px">Win Rate</p>
-          <div class="row gap-12">
+          <p class="label" style="margin-bottom:6px">Win Rate</p>
+          <div class="row gap-8">
             <div class="ring-wrap">
-              <svg viewBox="0 0 80 80" width="68" height="68">
-                <circle cx="40" cy="40" r="${ringR}" fill="none" stroke="var(--border)" stroke-width="5"/>
-                <circle cx="40" cy="40" r="${ringR}" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${filled} ${circ}" stroke-dashoffset="${circ*0.25}" style="transform:rotate(-90deg);transform-origin:center"/>
+              <svg viewBox="0 0 56 56" width="56" height="56">
+                <circle cx="28" cy="28" r="${ringR}" fill="none" stroke="var(--border)" stroke-width="4"/>
+                <circle cx="28" cy="28" r="${ringR}" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${filled} ${circ}" stroke-dashoffset="${circ*0.25}" style="transform:rotate(-90deg);transform-origin:center"/>
               </svg>
-              <div class="ring-label"><span style="color:#fff;font-size:1rem;font-weight:900">${s.winRate.toFixed(0)}%</span></div>
+              <div class="ring-label"><span style="color:#fff;font-size:0.8125rem;font-weight:900">${s.winRate.toFixed(0)}%</span></div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:4px">
-              <div class="row gap-6"><div class="daily-dot" style="background:var(--green)"></div><span class="text-muted" style="font-size:0.6875rem">${s.totalWins}W</span></div>
-              <div class="row gap-6"><div class="daily-dot" style="background:var(--red)"></div><span class="text-muted" style="font-size:0.6875rem">${s.totalLosses}L</span></div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div class="row gap-4"><div class="daily-dot" style="background:var(--green)"></div><span class="text-muted" style="font-size:0.625rem">${s.totalWins}W</span></div>
+              <div class="row gap-4"><div class="daily-dot" style="background:var(--red)"></div><span class="text-muted" style="font-size:0.625rem">${s.totalLosses}L</span></div>
             </div>
           </div>
         </div>
         <div class="card card-amber">
           <p class="label" style="margin-bottom:6px">Green / Red</p>
-          <p class="text-amber" style="font-size:1.375rem;font-weight:900">${s.greenDays}G / ${s.redDays}R</p>
+          <p class="text-amber" style="font-size:1.25rem;font-weight:900">${s.greenDays}G / ${s.redDays}R</p>
           <p class="text-dim" style="font-size:0.625rem;margin-top:4px">${s.days>0?((s.greenDays/s.days)*100).toFixed(0):0}% green days</p>
         </div>
         <div class="card card-violet">
           <p class="label" style="margin-bottom:6px">Profit Factor</p>
-          <p class="text-violet mono" style="font-size:1.375rem;font-weight:900">${s.pf}</p>
+          <p class="text-violet mono" style="font-size:1.25rem;font-weight:900">${s.pf}</p>
           <p class="text-dim" style="font-size:0.625rem;margin-top:4px">Target: >2.0</p>
         </div>
       </div>
