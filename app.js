@@ -138,23 +138,24 @@ const MONTH_NAMES = ['January','February','March','April','May','June','July','A
 const daysInMonth = (y, m) => new Date(y, m + 1, 0).getDate();
 
 const CAT = {
-  mindset: { emoji:'\u{1F9E0}', color:'#60a5fa', label:'Mindset' },
-  lesson: { emoji:'\u{1F4DD}', color:'#10b981', label:'Lesson' },
-  strategy: { emoji:'\u{1F4A1}', color:'#f59e0b', label:'Strategy' },
-  frustration: { emoji:'\u{1F624}', color:'#ef4444', label:'Vent' },
-  goals: { emoji:'\u{1F3AF}', color:'#a78bfa', label:'Goals' },
-  freewrite: { emoji:'\u{1F4D6}', color:'#64748b', label:'Free Write' },
+  mindset: { color:'#60a5fa', label:'Mindset' },
+  lesson: { color:'#10b981', label:'Lesson' },
+  strategy: { color:'#f59e0b', label:'Strategy' },
+  frustration: { color:'#ef4444', label:'Vent' },
+  goals: { color:'#a78bfa', label:'Goals' },
+  freewrite: { color:'#64748b', label:'Free Write' },
 };
 
 const MOOD = {
-  locked: { emoji:'\u{1F525}', label:'Locked In' },
-  calm: { emoji:'\u{1F60C}', label:'Calm' },
-  neutral: { emoji:'\u{1F610}', label:'Neutral' },
-  frustrated: { emoji:'\u{1F623}', label:'Frustrated' },
-  anxious: { emoji:'\u{1F630}', label:'Anxious' },
+  locked: { label:'Locked In' },
+  calm: { label:'Calm' },
+  neutral: { label:'Neutral' },
+  frustrated: { label:'Frustrated' },
+  anxious: { label:'Anxious' },
 };
 
-const RATING_EMOJI = { great:'\u{1F7E2}', okay:'\u{1F7E1}', bad:'\u{1F534}' };
+const RATING_EMOJI = { great:'\u25CF', okay:'\u25CF', bad:'\u25CF' };
+const RATING_COLOR = { great:'var(--green)', okay:'var(--amber)', bad:'var(--red)' };
 
 // ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ State ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
 let state = {
@@ -402,8 +403,8 @@ function renderJournal() {
         const mood = MOOD[e.mood] || MOOD.neutral;
         return '<div class="journal-card" data-view-journal="'+e.id+'">'
           + '<div class="row between" style="margin-bottom:6px">'
-          + '<div class="row gap-6"><span style="font-size:1rem">'+cat.emoji+'</span><span class="heading-md" style="font-size:0.8125rem">'+esc(e.title)+'</span></div>'
-          + '<span style="font-size:1rem">'+mood.emoji+'</span>'
+          + '<span class="heading-md" style="font-size:0.8125rem">'+esc(e.title)+'</span>'
+          + '<span class="text-muted" style="font-size:0.75rem">'+mood.label+'</span>'
           + '</div>'
           + '<p class="journal-body-preview">'+esc(e.body)+'</p>'
           + '<div class="row gap-8" style="margin-top:8px">'
@@ -439,11 +440,11 @@ function renderDetail() {
           }).join('')
         + '</div>'
         + '<div class="row gap-8" style="margin-bottom:16px">'
-        + '<span class="pill" style="background:'+(RATING_EMOJI[dailyEntry.rating]==='\u{1F7E2}'?'#065f46':RATING_EMOJI[dailyEntry.rating]==='\u{1F7E1}'?'#78350f':'#7f1d1d')+';color:'+(RATING_EMOJI[dailyEntry.rating]==='\u{1F7E2}'?'#6ee7b7':RATING_EMOJI[dailyEntry.rating]==='\u{1F7E1}'?'#fde68a':'#fca5a5')+'">'+(RATING_EMOJI[dailyEntry.rating]||'\u26AA')+' '+dailyEntry.rating+'</span>'
+        + '<span class="pill" style="background:'+(dailyEntry.rating==='great'?'#065f46':dailyEntry.rating==='okay'?'#78350f':'#7f1d1d')+';color:'+(dailyEntry.rating==='great'?'#6ee7b7':dailyEntry.rating==='okay'?'#fde68a':'#fca5a5')+'">'+dailyEntry.rating+'</span>'
         + (dailyEntry.session ? '<span class="text-muted" style="font-size:0.6875rem">'+dailyEntry.session+'</span>' : '')
         + '</div>'
-        + (dailyEntry.preMarket ? '<div class="detail-section"><p style="color:var(--amber);font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">\u{1F4CB} Pre-Market</p><p style="color:var(--text-1);font-size:0.8125rem;line-height:1.6;white-space:pre-wrap">'+esc(dailyEntry.preMarket)+'</p></div>' : '')
-        + (dailyEntry.postMarket ? '<div class="detail-section"><p style="color:var(--green);font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">\u{1F4DD} Post-Market</p><p style="color:var(--text-1);font-size:0.8125rem;line-height:1.6;white-space:pre-wrap">'+esc(dailyEntry.postMarket)+'</p></div>' : '')
+        + (dailyEntry.preMarket ? '<div class="detail-section"><p style="color:var(--amber);font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Pre-Market</p><p style="color:var(--text-1);font-size:0.8125rem;line-height:1.6;white-space:pre-wrap">'+esc(dailyEntry.preMarket)+'</p></div>' : '')
+        + (dailyEntry.postMarket ? '<div class="detail-section"><p style="color:var(--green);font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Post-Market</p><p style="color:var(--text-1);font-size:0.8125rem;line-height:1.6;white-space:pre-wrap">'+esc(dailyEntry.postMarket)+'</p></div>' : '')
         + '<button class="btn-danger" style="margin-top:12px" data-delete-daily="'+dailyEntry.id+'">Delete daily review</button>'
         : '<p class="text-dim" style="margin-bottom:16px">No daily review for this date.</p>')
       + '<h3 class="heading-lg" style="margin-top:24px;margin-bottom:12px">Trades ('+dayTrades.length+')</h3>'
@@ -462,7 +463,7 @@ function renderDetail() {
             + '</div>'
             + '<button class="btn-danger-sm" data-delete-trade="'+t.id+'">Delete trade</button>'
             + '<button class="btn btn-secondary" style="margin-left:6px;font-size:0.6875rem;padding:4px 10px" data-edit-trade="' + t.id + '">Edit</button>'
-            + (t.notes ? '<p class="text-dim" style="font-size:0.6875rem;margin-top:4px;font-style:italic">\uD83D\uDCDD ' + esc(t.notes) + '</p>' : '')
+            + (t.notes ? '<p class="text-muted" style="font-size:0.6875rem;margin-top:4px;font-style:italic">' + esc(t.notes) + '</p>' : '')
             + '</div>';
         }).join('')
       + '</div></div>';
@@ -472,14 +473,11 @@ function renderDetail() {
     const mood = MOOD[e.mood] || MOOD.neutral;
     app.innerHTML = '<div class="app-shell"><div class="app-content" style="padding-bottom:40px">'
       + '<button class="back-btn" id="back-btn">\u2190 Back</button>'
-      + '<div class="row gap-8" style="margin-bottom:4px">'
-      + '<span style="font-size:1.375rem">'+cat.emoji+'</span>'
-      + '<h2 class="heading-xl">'+esc(e.title)+'</h2>'
-      + '</div>'
+      + '<h2 class="heading-xl" style="margin-bottom:4px">'+esc(e.title)+'</h2>'
       + '<div class="row gap-8" style="margin-bottom:20px">'
       + '<span class="pill" style="color:'+cat.color+';background:'+cat.color+'15">'+cat.label+'</span>'
       + '<span class="text-muted" style="font-size:0.6875rem">'+fmtDateLong(e.date)+'</span>'
-      + '<span class="text-muted" style="font-size:0.6875rem">\u00B7 '+mood.emoji+' '+mood.label+'</span>'
+      + '<span class="text-muted" style="font-size:0.6875rem">\u00B7 '+mood.label+'</span>'
       + '</div>'
       + '<p style="color:var(--text-1);font-size:0.875rem;line-height:1.8;white-space:pre-wrap">'+esc(e.body)+'</p>'
       + '<button class="btn-danger" style="margin-top:24px" id="delete-btn">Delete entry</button>'
@@ -498,12 +496,12 @@ function renderDetail() {
         }).join('')
       + '</div>'
       + '<div class="row gap-8" style="margin-bottom:16px">'
-      + '<span class="pill" style="background:'+(RATING_EMOJI[e.rating]==='\u{1F7E2}'?'#065f46':RATING_EMOJI[e.rating]==='\u{1F7E1}'?'#78350f':'#7f1d1d')+';color:'+(RATING_EMOJI[e.rating]==='\u{1F7E2}'?'#6ee7b7':RATING_EMOJI[e.rating]==='\u{1F7E1}'?'#fde68a':'#fca5a5')+'">'+(RATING_EMOJI[e.rating]||'\u26AA')+' '+e.rating+'</span>'
+      + '<span class="pill" style="background:'+(e.rating==='great'?'#065f46':e.rating==='okay'?'#78350f':'#7f1d1d')+';color:'+(e.rating==='great'?'#6ee7b7':e.rating==='okay'?'#fde68a':'#fca5a5')+'">'+e.rating+'</span>'
       + (e.session ? '<span class="text-muted" style="font-size:0.6875rem">'+e.session+'</span>' : '')
-      + (e.reviewed ? '<span class="pill" style="background:#065f46;color:#6ee7b7">\u2713 Reviewed</span>' : '')
+      + (e.reviewed ? '<span class="pill" style="background:#065f46;color:#6ee7b7">Reviewed</span>' : '')
       + '</div>'
-      + (e.preMarket ? '<div class="detail-section"><p style="color:var(--amber);font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">\u{1F4CB} Pre-Market</p><p style="color:var(--text-1);font-size:0.8125rem;line-height:1.6;white-space:pre-wrap">'+esc(e.preMarket)+'</p></div>' : '')
-      + (e.postMarket ? '<div class="detail-section"><p style="color:var(--green);font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">\u{1F4DD} Post-Market</p><p style="color:var(--text-1);font-size:0.8125rem;line-height:1.6;white-space:pre-wrap">'+esc(e.postMarket)+'</p></div>' : '')
+      + (e.preMarket ? '<div class="detail-section"><p style="color:var(--amber);font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Pre-Market</p><p style="color:var(--text-1);font-size:0.8125rem;line-height:1.6;white-space:pre-wrap">'+esc(e.preMarket)+'</p></div>' : '')
+      + (e.postMarket ? '<div class="detail-section"><p style="color:var(--green);font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Post-Market</p><p style="color:var(--text-1);font-size:0.8125rem;line-height:1.6;white-space:pre-wrap">'+esc(e.postMarket)+'</p></div>' : '')
       + '<button class="btn-danger" style="margin-top:16px" id="delete-btn">Delete entry</button>'
       + '</div></div>';
   }
@@ -589,12 +587,12 @@ function renderModal() {
   if (state.modal === 'picker') {
     content = '<h3 class="heading-lg" style="text-align:center;margin-bottom:16px">Quick Add</h3>'
       + '<div class="stack">'
-      + '<button class="picker-btn" data-pick="daily"><span style="font-size:1.75rem">\u{1F4C5}</span><div><p style="font-weight:700;font-size:0.875rem">Daily Review</p><p class="text-muted" style="font-size:0.6875rem">Log today\u2019s P&L and notes</p></div></button>'
-      + '<button class="picker-btn" data-pick="trade"><span style="font-size:1.75rem">\u{1F4C8}</span><div><p style="font-weight:700;font-size:0.875rem">Trade Entry</p><p class="text-muted" style="font-size:0.6875rem">Log an individual trade</p></div></button>'
-      + '<button class="picker-btn" data-pick="journal"><span style="font-size:1.75rem">\u270D\uFE0F</span><div><p style="font-weight:700;font-size:0.875rem">Journal Entry</p><p class="text-muted" style="font-size:0.6875rem">Write a reflection</p></div></button>'
+      + '<button class="picker-btn" data-pick="daily"><div><p style="font-weight:700;font-size:0.875rem">Daily Review</p><p class="text-muted" style="font-size:0.6875rem">Log today\u2019s P&L and notes</p></div></button>'
+      + '<button class="picker-btn" data-pick="trade"><div><p style="font-weight:700;font-size:0.875rem">Trade Entry</p><p class="text-muted" style="font-size:0.6875rem">Log an individual trade</p></div></button>'
+      + '<button class="picker-btn" data-pick="journal"><div><p style="font-weight:700;font-size:0.875rem">Journal Entry</p><p class="text-muted" style="font-size:0.6875rem">Write a reflection</p></div></button>'
       + '</div>';
   } else if (state.modal === 'daily') {
-    content = '<h3 class="heading-lg" style="margin-bottom:12px">\u{1F4C5} Daily Review</h3>'
+    content = '<h3 class="heading-lg" style="margin-bottom:12px">Daily Review</h3>'
       + '<div class="stack gap-12">'
       + '<div class="form-group"><label class="form-label">Date</label><input type="date" class="input" id="m-date" value="'+today()+'"></div>'
       + '<div class="grid-3">'
@@ -604,14 +602,14 @@ function renderModal() {
       + '</div>'
       + '<div class="grid-2">'
       + '<div class="form-group"><label class="form-label">Total Trades</label><input type="number" class="input" id="m-trades" placeholder="0"></div>'
-      + '<div class="form-group"><label class="form-label">Rating</label><select class="select" id="m-rating"><option value="great">\u{1F7E2} Great</option><option value="okay">\u{1F7E1} Okay</option><option value="bad">\u{1F534} Bad</option></select></div>'
+      + '<div class="form-group"><label class="form-label">Rating</label><select class="select" id="m-rating"><option value="great">Great</option><option value="okay">Okay</option><option value="bad">Bad</option></select></div>'
       + '</div>'
       + '<div class="form-group"><label class="form-label">Pre-Market Notes</label><textarea class="textarea" id="m-pre" rows="3" placeholder="Events, bias, watchlist..."></textarea></div>'
       + '<div class="form-group"><label class="form-label">Post-Market Review</label><textarea class="textarea" id="m-post" rows="3" placeholder="What went well, what to improve..."></textarea></div>'
       + '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Back</button><button class="btn btn-primary" style="flex:2" id="m-save">Save Entry</button></div>'
       + '</div>';
   } else if (state.modal === 'trade') {
-    content = '<h3 class="heading-lg" style="margin-bottom:12px">\u{1F4C8} Trade Entry</h3>'
+    content = '<h3 class="heading-lg" style="margin-bottom:12px">Trade Entry</h3>'
       + '<div class="stack gap-12">'
       + '<div class="grid-2">'
       + '<div class="form-group"><label class="form-label">Date</label><input type="date" class="input" id="m-date" value="'+today()+'"></div>'
@@ -628,7 +626,7 @@ function renderModal() {
       + '<div class="form-group"><label class="form-label">Exit</label><input type="number" step="0.01" class="input mono" id="m-exit" placeholder="0"></div>'
       + '</div>'
       + '<div class="grid-2">'
-      + '<div class="form-group"><label class="form-label">Emotions</label><select class="select" id="m-emotions"><option value="calm">\u{1F60C} Calm</option><option value="confident">\u{1F4AA} Confident</option><option value="patient">\u{1F9D8} Patient</option><option value="FOMO">\u{1F631} FOMO</option><option value="frustration">\u{1F624} Frustration</option><option value="revenge">\u{1F525} Revenge</option></select></div>'
+      + '<div class="form-group"><label class="form-label">Emotions</label><select class="select" id="m-emotions"><option value="calm">Calm</option><option value="confident">Confident</option><option value="patient">Patient</option><option value="FOMO">FOMO</option><option value="frustration">Frustration</option><option value="revenge">Revenge</option></select></div>'
       + '<div class="form-group"><label class="form-label">Rating</label>'
       + '<div class="row gap-4" id="m-stars" style="margin-top:4px">'
       + [1,2,3,4,5].map(function(n) { return '<button class="star-btn" data-star="'+n+'" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:'+(n<=4?'var(--amber)':'var(--bg-0)')+';color:'+(n<=4?'#000':'var(--text-3)')+';font-weight:800;font-size:0.75rem;cursor:pointer;font-family:var(--font)">\u2605</button>'; }).join('')
@@ -640,7 +638,7 @@ function renderModal() {
   } else if (state.modal === 'edit-trade') {
     var t = state.editingTrade;
     if (t) {
-      content = '<h3 class="heading-lg" style="margin-bottom:12px">\u270F\uFE0F Edit Trade</h3>' +
+      content = '<h3 class="heading-lg" style="margin-bottom:12px">Edit Trade</h3>' +
         '<div class="stack gap-12">' +
         '<div class="grid-2">' +
         '<div class="form-group"><label class="form-label">Date</label><input type="date" class="input" id="m-date" value="' + (t.date||'') + '"></div>' +
@@ -663,13 +661,13 @@ function renderModal() {
         '</div>';
     }
   } else if (state.modal === 'journal') {
-    content = '<h3 class="heading-lg" style="margin-bottom:12px">\u270D\uFE0F Journal Entry</h3>'
+    content = '<h3 class="heading-lg" style="margin-bottom:12px">Journal Entry</h3>'
       + '<div class="stack gap-12">'
       + '<div class="form-group"><label class="form-label">Title</label><input class="input" id="m-title" placeholder="What\u2019s on your mind?"></div>'
       + '<div class="grid-3">'
       + '<div class="form-group"><label class="form-label">Date</label><input type="date" class="input" id="m-date" value="'+today()+'"></div>'
-      + '<div class="form-group"><label class="form-label">Category</label><select class="select" id="m-cat"><option value="mindset">\u{1F9E0} Mindset</option><option value="lesson">\u{1F4DD} Lesson</option><option value="strategy">\u{1F4A1} Strategy</option><option value="frustration">\u{1F624} Vent</option><option value="goals">\u{1F3AF} Goals</option><option value="freewrite">\u{1F4D6} Free Write</option></select></div>'
-      + '<div class="form-group"><label class="form-label">Mood</label><select class="select" id="m-mood"><option value="locked">\u{1F525} Locked In</option><option value="calm">\u{1F60C} Calm</option><option value="neutral">\u{1F610} Neutral</option><option value="frustrated">\u{1F623} Frustrated</option><option value="anxious">\u{1F630} Anxious</option></select></div>'
+      + '<div class="form-group"><label class="form-label">Category</label><select class="select" id="m-cat"><option value="mindset">Mindset</option><option value="lesson">Lesson</option><option value="strategy">Strategy</option><option value="frustration">Vent</option><option value="goals">Goals</option><option value="freewrite">Free Write</option></select></div>'
+      + '<div class="form-group"><label class="form-label">Mood</label><select class="select" id="m-mood"><option value="locked">Locked In</option><option value="calm">Calm</option><option value="neutral">Neutral</option><option value="frustrated">Frustrated</option><option value="anxious">Anxious</option></select></div>'
       + '</div>'
       + '<div class="form-group"><label class="form-label">Write</label><textarea class="textarea" id="m-body" rows="6" placeholder="Let it out..."></textarea></div>'
       + '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Back</button><button class="btn btn-primary" style="flex:2" id="m-save">Save Entry</button></div>'
