@@ -59,17 +59,17 @@ function computeStreaks(daily, journal) {
 function renderStreakCard(daily, journal) {
   var s = computeStreaks(daily, journal);
   var fire = function(n) {
-    if (n >= 10) return '\u{1F525}\u{1F525}\u{1F525}';
-    if (n >= 5) return '\u{1F525}\u{1F525}';
-    if (n >= 1) return '\u{1F525}';
-    return '\u26AA';
+    if (n >= 10) return '10+';
+    if (n >= 5) return n + '';
+    if (n >= 1) return n + '';
+    return '0';
   };
   return '<div class="card card-amber">' +
-    '<p class="label" style="margin-bottom:8px">\u{1F525} Streaks</p>' +
+    '<p class="label" style="margin-bottom:8px">Streaks</p>' +
     '<div class="grid-3">' +
     '<div style="text-align:center"><p style="font-size:1.5rem;font-weight:900;color:var(--green)">' + s.greenStreak + '</p><p class="text-dim" style="font-size:0.5625rem">' + fire(s.greenStreak) + ' Green Days</p></div>' +
-    '<div style="text-align:center"><p style="font-size:1.5rem;font-weight:900;color:var(--amber)">' + s.journalStreak + '</p><p class="text-dim" style="font-size:0.5625rem">\u270D\uFE0F Journal</p></div>' +
-    '<div style="text-align:center"><p style="font-size:1.5rem;font-weight:900;color:var(--violet)">' + s.bestStreak + '</p><p class="text-dim" style="font-size:0.5625rem">\u{1F3C6} Best Ever</p></div>' +
+    '<div style="text-align:center"><p style="font-size:1.5rem;font-weight:900;color:var(--amber)">' + s.journalStreak + '</p><p class="text-dim" style="font-size:0.5625rem">Journal</p></div>' +
+    '<div style="text-align:center"><p style="font-size:1.5rem;font-weight:900;color:var(--violet)">' + s.bestStreak + '</p><p class="text-dim" style="font-size:0.5625rem">Best Ever</p></div>' +
     '</div></div>';
 }
 
@@ -95,16 +95,16 @@ function renderRuleViolations(daily) {
   var violations = checkRules(daily);
   if (violations.length === 0) {
     return '<div class="card card-green" style="text-align:center;padding:16px">' +
-      '<p style="font-size:1.5rem;margin-bottom:4px">\u2705</p>' +
+      '<p style="font-size:1rem;margin-bottom:4px;color:var(--green);font-weight:900">CLEAN</p>' +
       '<p class="heading-md" style="color:var(--green)">Clean Record</p>' +
       '<p class="text-dim" style="font-size:0.6875rem">No rule violations in recent days!</p></div>';
   }
   return '<div class="card card-red">' +
-    '<p class="label" style="margin-bottom:8px">\u26A0\uFE0F Rule Violations</p>' +
+    '<p class="label" style="margin-bottom:8px">Rule Violations</p>' +
     violations.map(function(v) {
       var color = v.severity === 'high' ? 'var(--red)' : 'var(--amber)';
       return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">' +
-        '<span style="color:' + color + ';font-size:0.75rem;font-weight:800">' + (v.severity === 'high' ? '\u{1F534}' : '\u{1F7E1}') + '</span>' +
+        '<span style="color:' + color + ';font-size:0.75rem;font-weight:900">\u25CF</span>' +
         '<div style="flex:1"><p style="font-size:0.75rem;font-weight:700">' + v.rule + '</p>' +
         '<p class="text-dim" style="font-size:0.5625rem">' + v.detail + '</p></div>' +
         '<span class="text-dim" style="font-size:0.5625rem">' + fmtDate(v.date) + '</span></div>';
@@ -131,7 +131,7 @@ function renderStrategyBreakdown(trades) {
   if (strats.length === 0) return '';
   var maxPnl = Math.max.apply(null, strats.map(function(x) { return Math.abs(x.totalPnl) || 1; }));
   return '<div class="card">' +
-    '<p class="label" style="margin-bottom:10px">\u{1F4CA} Strategy Performance</p>' +
+    '<p class="label" style="margin-bottom:10px">Strategy Performance</p>' +
     strats.map(function(s, i) {
       var wr = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
       var barW = Math.min(100, Math.abs(s.totalPnl) / maxPnl * 100);
@@ -190,22 +190,22 @@ function renderMonthlyRecap(daily, trades, journal) {
   var recap = computeMonthlyRecap(daily, trades, journal);
   if (recap.tradingDays === 0) {
     return '<div class="card" style="text-align:center;padding:30px">' +
-      '<p style="font-size:2rem;margin-bottom:8px">\u{1F4CB}</p>' +
+      '' +
       '<p class="heading-md">No data this month</p>' +
       '<p class="text-dim" style="font-size:0.75rem;margin-top:4px">Start logging trades to see your monthly recap!</p></div>';
   }
   return '<div class="stack">' +
     '<div class="card">' +
-    '<h3 class="heading-lg" style="margin-bottom:12px">\u{1F4CB} ' + recap.monthName + ' Recap</h3>' +
+    '<h3 class="heading-lg" style="margin-bottom:12px">' + recap.monthName + ' Recap</h3>' +
     '<div class="grid-2" style="margin-bottom:12px">' +
     '<div class="detail-stat"><p class="label" style="font-size:0.5rem">Net P&L</p><p class="mono" style="font-size:1.125rem;font-weight:900;color:' + (recap.totalPnl >= 0 ? 'var(--green)' : 'var(--red)') + ';margin-top:2px">' + fmtK(recap.totalPnl) + '</p></div>' +
     '<div class="detail-stat"><p class="label" style="font-size:0.5rem">Win Rate</p><p style="font-size:1.125rem;font-weight:900;color:var(--amber);margin-top:2px">' + recap.winRate + '%</p></div>' +
     '<div class="detail-stat"><p class="label" style="font-size:0.5rem">Green / Red</p><p style="font-size:1.125rem;font-weight:900;margin-top:2px"><span style="color:var(--green)">' + recap.greenDays + 'G</span> / <span style="color:var(--red)">' + recap.redDays + 'R</span></p></div>' +
     '<div class="detail-stat"><p class="label" style="font-size:0.5rem">Avg Daily</p><p class="mono" style="font-size:1.125rem;font-weight:900;color:' + (recap.avgPnl >= 0 ? 'var(--green)' : 'var(--red)') + ';margin-top:2px">' + fmt(Math.round(recap.avgPnl)) + '</p></div>' +
     '</div>' +
-    (recap.bestDay ? '<div class="row between" style="padding:6px 0;border-bottom:1px solid var(--border)"><span class="text-dim" style="font-size:0.625rem">\u{1F3C6} Best Day</span><span class="mono" style="color:var(--green);font-size:0.75rem;font-weight:800">' + fmtDate(recap.bestDay.date) + ' ' + fmt(recap.bestDay.pnl) + '</span></div>' : '') +
-    (recap.worstDay ? '<div class="row between" style="padding:6px 0;border-bottom:1px solid var(--border)"><span class="text-dim" style="font-size:0.625rem">\u{1F4A9} Worst Day</span><span class="mono" style="color:var(--red);font-size:0.75rem;font-weight:800">' + fmtDate(recap.worstDay.date) + ' ' + fmt(recap.worstDay.pnl) + '</span></div>' : '') +
-    '<div class="row between" style="padding:6px 0"><span class="text-dim" style="font-size:0.625rem">\u270D\uFE0F Journal Entries</span><span style="font-weight:700">' + recap.journalCount + '</span></div>' +
+    (recap.bestDay ? '<div class="row between" style="padding:6px 0;border-bottom:1px solid var(--border)"><span class="text-dim" style="font-size:0.625rem">Best Day</span><span class="mono" style="color:var(--green);font-size:0.75rem;font-weight:800">' + fmtDate(recap.bestDay.date) + ' ' + fmt(recap.bestDay.pnl) + '</span></div>' : '') +
+    (recap.worstDay ? '<div class="row between" style="padding:6px 0;border-bottom:1px solid var(--border)"><span class="text-dim" style="font-size:0.625rem">Worst Day</span><span class="mono" style="color:var(--red);font-size:0.75rem;font-weight:800">' + fmtDate(recap.worstDay.date) + ' ' + fmt(recap.worstDay.pnl) + '</span></div>' : '') +
+    '<div class="row between" style="padding:6px 0"><span class="text-dim" style="font-size:0.625rem">Journal Entries</span><span style="font-weight:700">' + recap.journalCount + '</span></div>' +
     '</div>' +
     (recap.weeks.length > 0 ? '<div class="card"><p class="label" style="margin-bottom:8px">Weekly Breakdown</p><div style="display:flex;gap:6px">' +
     recap.weeks.map(function(w) {
@@ -397,7 +397,7 @@ function renderPnlGoals(daily) {
 
   return '<div class="card" id="pnl-goals-card">' +
     '<div class="row between" style="margin-bottom:10px">' +
-    '<p class="label">\uD83C\uDFAF P&L Goals</p>' +
+    '<p class="label">P&L Goals</p>' +
     '<button class="btn btn-secondary" id="' + editId + '" style="font-size:0.625rem;padding:4px 10px">Edit</button>' +
     '</div>' +
     '<div id="' + formId + '" style="display:none;margin-bottom:10px">' +

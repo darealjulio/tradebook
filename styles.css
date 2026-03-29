@@ -3,7 +3,7 @@
 :root {
   --bg-0: #050810; --bg-1: #0c1018; --bg-2: #111827; --bg-3: #1a2235;
   --border: #1c2536;
-  --text-0: #f1f5f9; --text-1: #cbd5e1; --text-2: #64748b; --text-3: #334155;
+  --text-0: #f1f5f9; --text-1: #e2e8f0; --text-2: #cbd5e1; --text-3: #94a3b8;
   --green: #10b981; --green-dim: #065f46; --green-glow: rgba(16,185,129,0.12);
   --red: #ef4444; --red-dim: #7f1d1d;
   --amber: #f59e0b; --violet: #818cf8; --blue: #60a5fa;
@@ -23,7 +23,7 @@ body { font-family: var(--font); background: var(--bg-0); color: var(--text-0); 
 .heading-xl { font-size:1.75rem; font-weight:900; letter-spacing:-0.03em; line-height:1.1; }
 .heading-lg { font-size:1.25rem; font-weight:800; letter-spacing:-0.02em; }
 .heading-md { font-size:1.0625rem; font-weight:700; }
-.label { font-size:0.75rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-2); }
+.label { font-size:0.75rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-1); }
 .mono { font-family:var(--mono); }
 .text-green { color:var(--green); }
 .text-red { color:var(--red); }
@@ -55,14 +55,14 @@ body { font-family: var(--font); background: var(--bg-0); color: var(--text-0); 
 .select { -webkit-appearance:none; appearance:none; }
 .textarea { resize:vertical; line-height:1.6; }
 .form-group { display:flex; flex-direction:column; gap:4px; }
-.form-label { font-size:0.75rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-2); }
+.form-label { font-size:0.75rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-1); }
 
 .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
-.cal-header { text-align:center; color:var(--text-2); font-size:0.8125rem; font-weight:700; padding:6px 0; }
+.cal-header { text-align:center; color:var(--text-1); font-size:0.8125rem; font-weight:700; padding:6px 0; }
 .cal-cell { border-radius:10px; min-height:62px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; padding:4px 2px; }
-.cal-day-num { position:absolute; top:4px; right:5px; font-size:0.6875rem; color:var(--text-2); font-weight:600; }
+.cal-day-num { position:absolute; top:4px; right:5px; font-size:0.6875rem; color:var(--text-1); font-weight:600; }
 .cal-pnl { font-size:0.8125rem; font-weight:900; font-family:var(--mono); }
-.cal-trades { font-size:0.625rem; color:var(--text-2); margin-top:2px; font-weight:600; }
+.cal-trades { font-size:0.625rem; color:var(--text-1); margin-top:2px; font-weight:600; }
 
 .pill { display:inline-block; padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:600; }
 
