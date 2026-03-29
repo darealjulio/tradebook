@@ -305,9 +305,10 @@ function renderOverview(s) {
       ${typeof renderRuleViolations === 'function' ? renderRuleViolations(state.daily) : ''}
       ${typeof renderStrategyBreakdown === 'function' ? renderStrategyBreakdown(state.trades) : ''}
       ${typeof renderMonthlyRecap === 'function' ? renderMonthlyRecap(state.daily, state.trades, state.journal) : ''}
-      ${typeof renderExportSection === 'function' ? renderExportSection() : ''}
-
     ${typeof renderPnlGoals === 'function' ? renderPnlGoals(state.daily) : ''}
+    <div style="padding-top:20px">
+      <button class="btn" id="reset-all-btn" style="width:100%;background:transparent;border:1px solid rgba(239,68,68,0.25);color:var(--red);font-size:0.75rem;font-weight:600;padding:14px">Reset All Data</button>
+    </div>
   </div>
   `;
 }
@@ -852,9 +853,28 @@ function bindEvents() {
     });
   });
 
-  // Bind export buttons (features.js)
-  if (typeof bindExportButtons === 'function' && state.tab === 'overview') {
-    bindExportButtons();
+  // Reset all data button
+  var resetBtn = document.getElementById('reset-all-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async function() {
+      if (!confirm('Are you sure you want to delete ALL your data? This cannot be undone.')) return;
+      if (!confirm('This will permanently erase all daily entries, trades, and journal entries. Continue?')) return;
+      // Clear IndexedDB
+      var db = await openDB();
+      var tx = db.transaction(STORES, 'readwrite');
+      STORES.forEach(function(s) { tx.objectStore(s).clear(); });
+      // Clear Supabase
+      if (typeof sb !== 'undefined' && currentUser) {
+        var tables = ['daily_entries', 'trades', 'journal_entries'];
+        for (var i = 0; i < tables.length; i++) {
+          await sb.from(tables[i]).delete().eq('user_id', currentUser.id);
+        }
+      }
+      state.daily = [];
+      state.trades = [];
+      state.journal = [];
+      render();
+    });
   }
   // Bind custom strategy select (features.js)
   if (state.modal === 'trade' && typeof bindStrategySelect === 'function') {
