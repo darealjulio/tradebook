@@ -254,7 +254,7 @@ function renderOverview(s) {
             <div class="ring-wrap">
               <svg viewBox="0 0 56 56" width="56" height="56">
                 <circle cx="28" cy="28" r="${ringR}" fill="none" stroke="var(--border)" stroke-width="4"/>
-                <circle cx="28" cy="28" r="${ringR}" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${filled} ${circ}" stroke-dashoffset="${circ*0.25}" style="transform:rotate(-90deg);transform-origin:center"/>
+                <circle cx="28" cy="28" r="${ringR}" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${filled} ${circ}" transform="rotate(-90 28 28)"/>
               </svg>
               <div class="ring-label"><span style="color:#fff;font-size:0.8125rem;font-weight:900">${s.winRate.toFixed(0)}%</span></div>
             </div>
@@ -703,7 +703,7 @@ function initCharts(stats) {
       }]},
       options: { responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1f2937', borderColor: '#374151', borderWidth: 1, titleColor: '#9ca3af', bodyColor: '#fff', cornerRadius: 10, padding: 10, callbacks: { label: function(c){return '$'+c.raw.toLocaleString()} } }},
-        scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } }, border: { display: false } }, y: { grid: { color: 'rgba(31,41,55,0.5)' }, ticks: { font: { size: 9 }, callback: function(v){return '$'+(v/1000).toFixed(0)+'k'} }, border: { display: false } } }
+        scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } }, border: { display: false } }, y: { grid: { color: 'rgba(31,41,55,0.5)' }, ticks: { font: { size: 9 }, callback: function(v){return Math.abs(v)>=1000?'$'+(v/1000).toFixed(0)+'k':'$'+v} }, border: { display: false } } }
       }
     });
   }
@@ -719,7 +719,7 @@ function initCharts(stats) {
       }]},
       options: { responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1f2937', borderColor: '#374151', borderWidth: 1, titleColor: '#9ca3af', bodyColor: '#fff', cornerRadius: 10, padding: 10, callbacks: { label: function(c){return fmt(c.raw)} } }},
-        scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } }, border: { display: false } }, y: { grid: { color: 'rgba(31,41,55,0.5)' }, ticks: { font: { size: 9 }, callback: function(v){return '$'+(v/1000).toFixed(0)+'k'} }, border: { display: false } } }
+        scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } }, border: { display: false } }, y: { grid: { color: 'rgba(31,41,55,0.5)' }, ticks: { font: { size: 9 }, callback: function(v){return Math.abs(v)>=1000?'$'+(v/1000).toFixed(0)+'k':'$'+v} }, border: { display: false } } }
       }
     });
   }
