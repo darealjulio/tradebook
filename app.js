@@ -307,7 +307,8 @@ function renderOverview(s) {
       ${typeof renderStrategyBreakdown === 'function' ? renderStrategyBreakdown(state.trades) : ''}
       ${typeof renderMonthlyRecap === 'function' ? renderMonthlyRecap(state.daily, state.trades, state.journal) : ''}
     ${typeof renderPnlGoals === 'function' ? renderPnlGoals(state.daily) : ''}
-    <div style="padding-top:20px">
+    <div style="padding-top:20px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn" id="sync-data-btn" style="width:100%;background:transparent;border:1px solid rgba(16,185,129,0.25);color:var(--green);font-size:0.75rem;font-weight:600;padding:14px">Sync All Data</button>
       <button class="btn" id="reset-all-btn" style="width:100%;background:transparent;border:1px solid rgba(239,68,68,0.25);color:var(--red);font-size:0.75rem;font-weight:600;padding:14px">Reset All Data</button>
     </div>
   </div>
@@ -595,15 +596,7 @@ function renderModal() {
     content = '<h3 class="heading-lg" style="margin-bottom:12px">Daily Review</h3>'
       + '<div class="stack gap-12">'
       + '<div class="form-group"><label class="form-label">Date</label><input type="date" class="input" id="m-date" value="'+today()+'"></div>'
-      + '<div class="grid-3">'
-      + '<div class="form-group"><label class="form-label">Day P&L</label><input type="number" step="0.01" class="input mono" id="m-pnl" placeholder="'+String.fromCharCode(36)+'0.00"></div>'
-      + '<div class="form-group"><label class="form-label">Wins</label><input type="number" class="input" id="m-wins" placeholder="0"></div>'
-      + '<div class="form-group"><label class="form-label">Losses</label><input type="number" class="input" id="m-losses" placeholder="0"></div>'
-      + '</div>'
-      + '<div class="grid-2">'
-      + '<div class="form-group"><label class="form-label">Total Trades</label><input type="number" class="input" id="m-trades" placeholder="0"></div>'
       + '<div class="form-group"><label class="form-label">Rating</label><select class="select" id="m-rating"><option value="great">Great</option><option value="okay">Okay</option><option value="bad">Bad</option></select></div>'
-      + '</div>'
       + '<div class="form-group"><label class="form-label">Pre-Market Notes</label><textarea class="textarea" id="m-pre" rows="3" placeholder="Events, bias, watchlist..."></textarea></div>'
       + '<div class="form-group"><label class="form-label">Post-Market Review</label><textarea class="textarea" id="m-post" rows="3" placeholder="What went well, what to improve..."></textarea></div>'
       + '<div class="row gap-8"><button class="btn btn-secondary" style="flex:1" id="m-back">Back</button><button class="btn btn-primary" style="flex:2" id="m-save">Save Entry</button></div>'
@@ -851,6 +844,67 @@ function bindEvents() {
     });
   });
 
+  // Sync all data button — recalculates daily entries from trade entries
+  var syncBtn = document.getElementById('sync-data-btn');
+  if (syncBtn) {
+    syncBtn.addEventListener('click', async function() {
+      syncBtn.textContent = 'Syncing...';
+      syncBtn.disabled = true;
+      try {
+        // Build a map of dates with trades
+        var dateMap = {};
+        state.trades.forEach(function(t) {
+          if (!dateMap[t.date]) dateMap[t.date] = [];
+          dateMap[t.date].push(t);
+        });
+        // Update or create daily entries for each date with trades
+        for (var date in dateMap) {
+          var dayTrades = dateMap[date];
+          var dayPnl = dayTrades.reduce(function(s, t) { return s + (t.pnl || 0); }, 0);
+          var dayWins = dayTrades.filter(function(t) { return t.pnl > 0; }).length;
+          var dayLosses = dayTrades.filter(function(t) { return t.pnl < 0; }).length;
+          var existing = state.daily.find(function(d) { return d.date === date; });
+          if (existing) {
+            existing.pnl = dayPnl;
+            existing.trades = dayTrades.length;
+            existing.wins = dayWins;
+            existing.losses = dayLosses;
+            await dbPut('daily', existing);
+          } else {
+            var autoDaily = {
+              id: 'auto_' + (typeof currentUser !== 'undefined' && currentUser ? currentUser.id + '_' : '') + date,
+              date: date,
+              pnl: dayPnl,
+              trades: dayTrades.length,
+              wins: dayWins,
+              losses: dayLosses,
+              rating: 'okay',
+              session: 'New York',
+              preMarket: '',
+              postMarket: '',
+              reviewed: false,
+            };
+            state.daily.push(autoDaily);
+            await dbPut('daily', autoDaily);
+          }
+        }
+        // Remove auto-generated daily entries that have no matching trades
+        var toRemove = state.daily.filter(function(d) {
+          return d.id && d.id.toString().startsWith('auto_') && !dateMap[d.date];
+        });
+        for (var i = 0; i < toRemove.length; i++) {
+          state.daily = state.daily.filter(function(d) { return d.id !== toRemove[i].id; });
+          await dbDelete('daily', toRemove[i].id);
+        }
+        render();
+      } catch(e) {
+        console.error('Sync error:', e);
+        syncBtn.textContent = 'Sync Failed';
+        syncBtn.disabled = false;
+      }
+    });
+  }
+
   // Reset all data button
   var resetBtn = document.getElementById('reset-all-btn');
   if (resetBtn) {
@@ -892,21 +946,38 @@ async function handleSave() {
   try {
   var mode = state.modal;
   if (mode === 'daily') {
-    var entry = {
-      id: uid(),
-      date: ($('#m-date') || {}).value || today(),
-      pnl: parseFloat(($('#m-pnl') || {}).value) || 0,
-      trades: parseInt(($('#m-trades') || {}).value) || 0,
-      wins: parseInt(($('#m-wins') || {}).value) || 0,
-      losses: parseInt(($('#m-losses') || {}).value) || 0,
-      rating: ($('#m-rating') || {}).value || 'okay',
-      session: 'New York',
-      preMarket: ($('#m-pre') || {}).value || '',
-      postMarket: ($('#m-post') || {}).value || '',
-      reviewed: false,
-    };
-    state.daily.push(entry);
-    await dbPut('daily', entry);
+    var reviewDate = ($('#m-date') || {}).value || today();
+    var rating = ($('#m-rating') || {}).value || 'okay';
+    var preMarket = ($('#m-pre') || {}).value || '';
+    var postMarket = ($('#m-post') || {}).value || '';
+    var existingDaily = state.daily.find(function(d) { return d.date === reviewDate; });
+    if (existingDaily) {
+      existingDaily.rating = rating;
+      existingDaily.preMarket = preMarket;
+      existingDaily.postMarket = postMarket;
+      existingDaily.reviewed = true;
+      await dbPut('daily', existingDaily);
+    } else {
+      var dayTrades = state.trades.filter(function(t) { return t.date === reviewDate; });
+      var dayPnl = dayTrades.reduce(function(s, t) { return s + (t.pnl || 0); }, 0);
+      var dayWins = dayTrades.filter(function(t) { return t.pnl > 0; }).length;
+      var dayLosses = dayTrades.filter(function(t) { return t.pnl < 0; }).length;
+      var entry = {
+        id: uid(),
+        date: reviewDate,
+        pnl: dayPnl,
+        trades: dayTrades.length,
+        wins: dayWins,
+        losses: dayLosses,
+        rating: rating,
+        session: 'New York',
+        preMarket: preMarket,
+        postMarket: postMarket,
+        reviewed: true,
+      };
+      state.daily.push(entry);
+      await dbPut('daily', entry);
+    }
   } else if (mode === 'trade') {
     var ratingEl = document.querySelector('[data-rating]');
     var entry = {

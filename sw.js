@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tradebook-v21';
+const CACHE_NAME = 'tradebook-v22';
 const ASSETS = [
   '/',
   '/index.html',
